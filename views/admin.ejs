@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Panel Admin - MasAgua Spa</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Manrope', 'sans-serif'],
+          },
+          colors: {
+            primary: '#00796b',
+            primaryLight: '#48a999',
+          }
+        }
+      }
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&display=swap" rel="stylesheet" />
+</head>
+<body class="bg-[#f4f6f8] font-sans text-[#1f2937] min-h-screen flex flex-col">
+
+  <header class="bg-primary text-white shadow-md">
+  <div class="container mx-auto flex flex-wrap items-center justify-between p-4">
+    <h1 class="text-2xl font-bold tracking-wide">MasAgua - Panel Admin</h1>
+    <div class="flex items-center space-x-4">
+      <form method="POST" action="/logout">
+        <button type="submit" class="bg-white text-primary font-semibold px-4 py-2 rounded-full hover:bg-primaryLight hover:text-white transition">
+          Cerrar sesión
+        </button>
+      </form>
+    </div>
+  </div>
+</header>
+
+
+
+  <main class="container mx-auto flex-grow px-4 py-10">
+    <p class="text-center text-primaryLight text-xl font-semibold mb-4">
+      Bienvenido/a, <%= user.nombre %>
+    </p>
+    <h2 class="text-3xl font-extrabold text-primaryLight mb-8 text-center">Gestión Administrativa</h2>
+    
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+      
+      <!-- Card template -->
+    
+      <a href="/flota"" class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition p-6 flex flex-col items-center text-center group">
+        <!-- Icon: Truck -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-4 text-primaryLight group-hover:text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-6h13v6M9 17H4a1 1 0 00-1 1v1h6v-2zM9 17V7H4a1 1 0 00-1 1v2" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h3l3 3v4" />
+        </svg>
+        <h3 class="font-semibold text-lg text-primary mb-2">Flota de Vehículos</h3>
+        <p class="text-sm text-gray-600 mb-4">Administra camionetas.</p>
+        <button class="mt-auto bg-primary text-white py-2 px-5 rounded-full font-semibold hover:bg-primaryLight transition">Gestionar</button>
+      </a>
+
+      <a href="/choferes" class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition p-6 flex flex-col items-center text-center group">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-4 text-primaryLight group-hover:text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5.121 17.804A4 4 0 117.9 15m3.2 0a4 4 0 115.85 2.804M17 9a4 4 0 10-4-4 4 4 0 004 4z" />
+        </svg>
+        <h3 class="font-semibold text-lg text-primary mb-2">Choferes</h3>
+        <p class="text-sm text-gray-600 mb-4">Registra y administra los choferes de la empresa.</p>
+        <button class="mt-auto bg-primary text-white py-2 px-5 rounded-full font-semibold hover:bg-primaryLight transition">Gestionar</button>
+      </a>
+
+      <a href="/pedidos.html" class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition p-6 flex flex-col items-center text-center group">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-4 text-primaryLight group-hover:text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 7h18M3 12h18M3 17h18" />
+        </svg>
+        <h3 class="font-semibold text-lg text-primary mb-2">Pedidos</h3>
+        <p class="text-sm text-gray-600 mb-4">Visualiza, asigna y gestiona los pedidos de los clientes.</p>
+        <button class="mt-auto bg-primary text-white py-2 px-5 rounded-full font-semibold hover:bg-primaryLight transition">Gestionar</button>
+      </a>
+
+      <a href="/rutas.html" class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition p-6 flex flex-col items-center text-center group">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-4 text-primaryLight group-hover:text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 17l6-6M15 17V7h-6v10" />
+        </svg>
+        <h3 class="font-semibold text-lg text-primary mb-2">Asignación de Rutas</h3>
+        <p class="text-sm text-gray-600 mb-4">Optimiza y asigna rutas de reparto para la flota.</p>
+        <button class="mt-auto bg-primary text-white py-2 px-5 rounded-full font-semibold hover:bg-primaryLight transition">Gestionar</button>
+      </a>
+
+      <a href="/clientes.html" class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition p-6 flex flex-col items-center text-center group">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-4 text-primaryLight group-hover:text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M7 7a4 4 0 118 0 4 4 0 01-8 0zM5 21h14a2 2 0 002-2v-1a6 6 0 00-12 0v1a2 2 0 002 2z" />
+        </svg>
+        <h3 class="font-semibold text-lg text-primary mb-2">Clientes</h3>
+        <p class="text-sm text-gray-600 mb-4">Consulta y administra la info de clientes y planes.</p>
+        <button class="mt-auto bg-primary text-white py-2 px-5 rounded-full font-semibold hover:bg-primaryLight transition">Gestionar</button>
+      </a>
+
+      <a href="/catalogo.html" class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition p-6 flex flex-col items-center text-center group">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-4 text-primaryLight group-hover:text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 16v-1a4 4 0 014-4h10a4 4 0 014 4v1" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8 16v-1a4 4 0 014-4h2a4 4 0 014 4v1" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 20h18" />
+        </svg>
+        <h3 class="font-semibold text-lg text-primary mb-2">Catálogo de Servicios</h3>
+        <p class="text-sm text-gray-600 mb-4">Administra productos, imágenes y precios.</p>
+        <button class="mt-auto bg-primary text-white py-2 px-5 rounded-full font-semibold hover:bg-primaryLight transition">Gestionar</button>
+      </a>
+
+      <a href="/reportes.html" class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition p-6 flex flex-col items-center text-center group">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-4 text-primaryLight group-hover:text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-6h13v6M9 17H4a1 1 0 00-1 1v1h6v-2zM9 17V7H4a1 1 0 00-1 1v2" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h3l3 3v4" />
+        </svg>
+        <h3 class="font-semibold text-lg text-primary mb-2">Reportes</h3>
+        <p class="text-sm text-gray-600 mb-4">Genera reportes de ventas y entregas.</p>
+        <button class="mt-auto bg-primary text-white py-2 px-5 rounded-full font-semibold hover:bg-primaryLight transition">Gestionar</button>
+      </a>
+
+      <a href="/ajustes.html" class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition p-6 flex flex-col items-center text-center group">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-4 text-primaryLight group-hover:text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v1m0 14v1m8-9h1M4 12H3m15.364-6.364l.707.707M6.343 17.657l-.707.707m12.728 0l-.707.707M6.343 6.343l-.707-.707" />
+          <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" />
+        </svg>
+        <h3 class="font-semibold text-lg text-primary mb-2">Ajustes Generales</h3>
+        <p class="text-sm text-gray-600 mb-4">Configura parámetros del sistema y usuarios.</p>
+        <button class="mt-auto bg-primary text-white py-2 px-5 rounded-full font-semibold hover:bg-primaryLight transition">Gestionar</button>
+      </a>
+
+    </div>
+  </main>
+
+  <footer class="bg-primary text-white text-center py-6 mt-auto shadow-inner">
+    <p class="text-sm opacity-80">&copy; 2025 MasAgua Spa. Todos los derechos reservados.</p>
+  </footer>
+
+</body>
+</html>

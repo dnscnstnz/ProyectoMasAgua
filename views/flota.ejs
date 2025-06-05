@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Flota de Vehículos</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="p-4">
+  <h1 class="text-2xl font-bold mb-4">Flota de Vehículos</h1>
+
+  <form action="/flota/agregar" method="POST" class="mb-6 space-x-2">
+    <input type="text" name="patente" placeholder="Patente" required class="border p-1">
+    <input type="text" name="marca" placeholder="Marca" class="border p-1">
+    <input type="text" name="modelo" placeholder="Modelo" class="border p-1">
+    <input type="number" name="anio" placeholder="Año" class="border p-1">
+    <button type="submit" class="bg-blue-500 text-white px-4 py-1">Agregar</button>
+  </form>
+
+  <table class="w-full border">
+    <thead>
+      <tr class="bg-gray-200">
+        <th class="p-2 border">Patente</th>
+        <th class="p-2 border">Marca</th>
+        <th class="p-2 border">Modelo</th>
+        <th class="p-2 border">Año</th>
+        <th class="p-2 border">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% vehiculos.forEach(v => { %>
+        <tr>
+          <td class="border p-1"><%= v.patente %></td>
+          <td class="border p-1"><%= v.marca %></td>
+          <td class="border p-1"><%= v.modelo %></td>
+          <td class="border p-1"><%= v.anio %></td>
+          <td class="border p-1">
+            <form action="/flota/eliminar/<%= v.id %>" method="POST" onsubmit="return confirm('¿Eliminar este vehículo?')">
+              <button class="text-red-500">Eliminar</button>
+            </form>
+          </td>
+          <td class="border p-1">
+            <a href="/flota/editar/<%= v.id %>" class="text-blue-500">Editar</a>
+          </td>
+
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</body>
+</html>

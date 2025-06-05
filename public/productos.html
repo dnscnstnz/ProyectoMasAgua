@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MasAgua - Productos</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Manrope', 'sans-serif'],
+          },
+          colors: {
+            darkBlue: '#1e293b',
+            lightBlue: '#7dd3fc',
+            hoverBlue: '#38bdf8',
+            bgLight: '#f4f6f8',
+            textDark: '#1f2937',
+          }
+        }
+      }
+    };
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&display=swap" rel="stylesheet" />
+</head>
+<body class="bg-bgLight text-textDark font-sans">
+
+  <!-- Header -->
+  <header class="bg-darkBlue text-white shadow-md">
+    <div class="container mx-auto flex justify-between items-center p-4">
+      <h1 class="text-2xl font-bold tracking-wide">MasAgua</h1>
+      <nav class="space-x-6 hidden md:flex text-sm uppercase">
+        <a href="index.html" class="hover:text-lightBlue">Inicio</a>
+        <a href="productos.html" class="hover:text-lightBlue">Productos</a>
+        <a href="#" class="hover:text-lightBlue">Nosotros</a>
+        <a href="#" class="hover:text-lightBlue">Contacto</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Productos -->
+  <section class="py-20 bg-[#f9fafb]">
+    <div class="container mx-auto px-4">
+      <h2 class="text-4xl font-bold text-center text-darkBlue mb-12">Nuestros Productos</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 items-stretch">
+
+        <!-- Bidones -->
+        <div class="col-span-full mb-4 mt-8">
+          <h3 class="text-2xl font-bold text-darkBlue border-b-2 border-lightBlue inline-block pb-1">
+            Bidones
+          </h3>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-lg transition flex flex-col justify-between h-full">
+          <img src="img/bidon5.webp" class="mx-auto mb-4 w-32" alt="Bidón 5 Litros" />
+          <h3 class="text-xl font-semibold">Bidón 5 Litros</h3>
+          <p class="text-gray-600">Compacto y práctico para uso diario.</p>
+          <span class="text-lightBlue text-lg font-bold">$1.000</span>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-lg transition flex flex-col justify-between h-full">
+          <img src="img/bidon10.jpg" class="mx-auto mb-4 w-32" alt="Bidón 10 Litros" />
+          <h3 class="text-xl font-semibold">Bidón 10 Litros</h3>
+          <p class="text-gray-600">Perfecto para familias medianas.</p>
+          <span class="text-lightBlue text-lg font-bold">$1.500</span>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-lg transition flex flex-col justify-between h-full">
+          <img src="img/bidon20.jpg" class="mx-auto mb-4 w-32" alt="Bidón 20 Litros" />
+          <h3 class="text-xl font-semibold">Bidón 20 Litros</h3>
+          <p class="text-gray-600">Ideal para oficinas o eventos.</p>
+          <span class="text-lightBlue text-lg font-bold">$2.000</span>
+        </div>
+
+        <!-- Dispensadores -->
+        <div class="col-span-full mb-4 mt-8">
+          <h3 class="text-2xl font-bold text-darkBlue border-b-2 border-lightBlue inline-block pb-1">
+            Dispensadores
+          </h3>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-lg transition flex flex-col justify-between h-full">
+          <img src="img/dispensador-electrico-chico.jpg" class="mx-auto mb-4 w-32" alt="Dispensador Eléctrico" />
+          <h3 class="text-xl font-semibold">Dispensador Eléctrico</h3>
+          <p class="text-gray-600">Cómodo y moderno con botón táctil.</p>
+          <span class="text-lightBlue text-lg font-bold">$5.000</span>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-lg transition flex flex-col justify-between h-full">
+          <img src="img/dispensador-sobremesa.jpg" class="mx-auto mb-4 w-32" alt="Dispensador Básico Sobremesa" />
+          <h3 class="text-xl font-semibold">Dispensador Básico Sobremesa</h3>
+          <p class="text-gray-600">Compacto y portátil.</p>
+          <span class="text-lightBlue text-lg font-bold">$15.000</span>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-lg transition flex flex-col justify-between h-full">
+          <img src="img/dispensador-sobremesa-electrico.jpg" class="mx-auto mb-4 w-32" alt="Dispensador Eléctrico Sobremesa" />
+          <h3 class="text-xl font-semibold">Dispensador Eléctrico Sobremesa</h3>
+          <p class="text-gray-600">Agua fría y caliente.</p>
+          <span class="text-lightBlue text-lg font-bold">$65.000</span>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-lg transition flex flex-col justify-between h-full">
+          <img src="img/dispensador-pedestal.jpeg" class="mx-auto mb-4 w-32" alt="Dispensador Pedestal" />
+          <h3 class="text-xl font-semibold">Dispensador Pedestal</h3>
+          <p class="text-gray-600">Ideal para oficinas.</p>
+          <span class="text-lightBlue text-lg font-bold">$75.000</span>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-lg transition flex flex-col justify-between h-full">
+          <img src="img/dispensador-control-temperatura.jpg" class="mx-auto mb-4 w-32" alt="Dispensador Básico" />
+          <h3 class="text-xl font-semibold">Dispensador Básico</h3>
+          <p class="text-gray-600">Controla temperatura del agua.</p>
+          <span class="text-lightBlue text-lg font-bold">$100.000</span>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-lg transition flex flex-col justify-between h-full">
+          <img src="img/dispensador-bidon-oculto.jpg" class="mx-auto mb-4 w-32" alt="Dispensador Básico" />
+          <h3 class="text-xl font-semibold">Dispensador Básico</h3>
+          <p class="text-gray-600">Mejora estética visual.</p>
+          <span class="text-lightBlue text-lg font-bold">$165.000</span>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-darkBlue text-white py-8 mt-16">
+    <div class="container mx-auto px-4 text-center text-sm opacity-80">
+      <p>&copy; 2025 MasAgua. Hidratación con propósito. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+</body>
+</html>

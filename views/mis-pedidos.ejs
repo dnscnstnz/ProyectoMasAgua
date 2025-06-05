@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mis Pedidos - Mas Agua</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-blue-50 text-gray-900 min-h-screen flex justify-center p-6">
+  <div class="max-w-3xl w-full">
+    <h1 class="text-3xl font-semibold text-blue-700 mb-8 text-center">
+      Hola, <%= user.nombre %>. Aquí están tus pedidos:
+    </h1>
+
+    <% if (pedidos.length === 0) { %>
+      <p class="text-center text-gray-600">No tienes pedidos realizados aún.</p>
+    <% } else { %>
+      <% pedidos.forEach(pedido => { %>
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6 hover:shadow-xl transition-shadow duration-300">
+          <div class="flex justify-between items-center mb-4">
+            <div>
+              <strong class="text-lg font-semibold text-blue-800">Pedido #<%= pedido.id %></strong><br />
+              <small class="text-gray-500 text-sm">Fecha: <%= new Date(pedido.fecha).toLocaleString() %></small>
+            </div>
+            <div class="px-3 py-1 rounded-full font-semibold text-white
+              <%= pedido.estado === 'pendiente' ? 'bg-yellow-500' : '' %>
+              <%= pedido.estado === 'entregado' ? 'bg-green-600' : '' %>
+              <%= pedido.estado === 'cancelado' ? 'bg-red-600' : '' %>">
+              <%= pedido.estado.charAt(0).toUpperCase() + pedido.estado.slice(1) %>
+            </div>
+          </div>
+          <ul class="divide-y divide-gray-200">
+            <% pedido.productos.forEach(producto => { %>
+              <li class="flex justify-between py-2 text-gray-700">
+                <span class="font-medium text-blue-700"><%= producto.nombre %></span>
+                <span>Cantidad: <%= producto.cantidad %></span>
+              </li>
+            <% }) %>
+          </ul>
+        </div>
+      <% }) %>
+    <% } %>
+  </div>
+</body>
+</html>

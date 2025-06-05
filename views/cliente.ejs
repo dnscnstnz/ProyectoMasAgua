@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Panel Cliente - MasAgua</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Manrope', 'sans-serif'],
+          },
+          colors: {
+            primary: '#00796b',
+            primaryLight: '#48a999',
+          }
+        }
+      }
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&display=swap" rel="stylesheet" />
+</head>
+<body class="bg-[#f4f6f8] font-sans text-[#1f2937] min-h-screen flex flex-col">
+
+  <header class="bg-primary text-white shadow-md">
+    <div class="container mx-auto flex items-center justify-between p-4">
+      <h1 class="text-xl font-bold">MasAgua - Panel Cliente</h1>
+      <form method="POST" action="/logout">
+        <button type="submit" class="bg-white text-primary font-semibold px-4 py-2 rounded-full hover:bg-primaryLight hover:text-white transition">
+          Cerrar sesión
+        </button>
+      </form>
+    </div>
+  </header>
+
+  <main class="container mx-auto flex-grow px-4 py-10">
+
+    <!-- Mensaje de bienvenida con el nombre -->
+    <p class="text-center text-primaryLight text-xl font-semibold mb-4">
+      Bienvenido/a, <%= user.nombre %>
+    </p>
+
+    <h2 class="text-2xl font-bold text-center text-primaryLight mb-6">Bienvenido/a al Panel de Cliente</h2>
+
+    <div class="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
+
+      <!-- Pedido -->
+      <a href="/cliente/pedido" class="bg-white shadow-lg rounded-2xl p-6 text-center group hover:shadow-xl transition">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-primaryLight mb-4 group-hover:text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h4l3 8 4-16 3 8h4" />
+        </svg>
+        <h3 class="text-lg font-semibold text-primary mb-2">Realizar Pedido</h3>
+        <p class="text-sm text-gray-600">Haz un nuevo pedido de agua fácilmente.</p>
+      </a>
+
+      <!-- Ver historial -->
+      <a href="/historial.html" class="bg-white shadow-lg rounded-2xl p-6 text-center group hover:shadow-xl transition">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-primaryLight mb-4 group-hover:text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <h3 class="text-lg font-semibold text-primary mb-2">Historial de Pedidos</h3>
+        <p class="text-sm text-gray-600">Revisa tus compras anteriores.</p>
+      </a>
+
+      <!-- Perfil -->
+      <a href="/perfil.html" class="bg-white shadow-lg rounded-2xl p-6 text-center group hover:shadow-xl transition">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-primaryLight mb-4 group-hover:text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5.121 17.804A4 4 0 117.9 15m3.2 0a4 4 0 115.85 2.804M17 9a4 4 0 10-4-4 4 4 0 004 4z" />
+        </svg>
+        <h3 class="text-lg font-semibold text-primary mb-2">Mi Perfil</h3>
+        <p class="text-sm text-gray-600">Edita tu información personal.</p>
+      </a>
+
+    </div>
+  </main>
+
+  <footer class="bg-primary text-white text-center py-6 mt-auto shadow-inner">
+    <p class="text-sm opacity-80">&copy; 2025 MasAgua Spa. Todos los derechos reservados.</p>
+  </footer>
+
+</body>
+</html>

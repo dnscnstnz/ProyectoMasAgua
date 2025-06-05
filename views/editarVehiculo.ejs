@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Editar Vehículo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="p-4">
+  <h1 class="text-2xl font-bold mb-4">Editar Vehículo</h1>
+
+  <form action="/flota/editar/<%= vehiculo.id %>" method="POST" class="space-y-2">
+    <input type="text" name="patente" value="<%= vehiculo.patente %>" required class="border p-1 block w-full">
+    <input type="text" name="marca" value="<%= vehiculo.marca %>" class="border p-1 block w-full">
+    <input type="text" name="modelo" value="<%= vehiculo.modelo %>" class="border p-1 block w-full">
+    <input type="number" name="anio" value="<%= vehiculo.anio %>" class="border p-1 block w-full">
+    <button type="submit" class="bg-green-500 text-white px-4 py-2">Guardar Cambios</button>
+  </form>
+</body>
+</html>

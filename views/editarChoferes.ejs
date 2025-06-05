@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Editar Chofer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="p-4">
+  <h1 class="text-2xl font-bold mb-4">Editar Chofer</h1>
+
+  <form action="/choferes/editar/<%= chofer.id %>" method="POST" class="space-y-4 max-w-md">
+    <input type="text" name="nombre" value="<%= chofer.nombre %>" required class="border p-1 w-full">
+    <input type="text" name="rut" value="<%= chofer.rut %>" required class="border p-1 w-full">
+    <input type="text" name="telefono" value="<%= chofer.telefono %>" class="border p-1 w-full">
+    <button type="submit" class="bg-green-600 text-white px-4 py-1 rounded">Guardar cambios</button>
+    <a href="/choferes" class="text-gray-600 underline">Cancelar</a>
+  </form>
+</body>
+</html>

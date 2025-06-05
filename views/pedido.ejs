@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Pedido</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gradient-to-br from-blue-100 via-white to-blue-200 min-h-screen flex flex-col items-center justify-start py-12">
+  <div class="w-full max-w-7xl px-6">
+    <h1 class="text-4xl font-bold text-center text-blue-800 mb-10 drop-shadow">🛒 Realizar Pedido</h1>
+
+    <form action="/cliente/pedido" method="POST" class="grid grid-cols-1 lg:grid-cols-4 gap-10">
+      
+      <!-- Productos -->
+      <div class="lg:col-span-3 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8">
+        <% if (productos.length === 0) { %>
+          <p class="text-center text-gray-600 col-span-full">No hay productos disponibles 😢</p>
+        <% } else { %>
+          <% productos.forEach(producto => { %>
+            <div class="bg-white rounded-2xl shadow-lg p-6 hover:shadow-2xl transition duration-300 border border-blue-200">
+              <h2 class="text-xl font-bold text-blue-800 mb-2"><%= producto.nombre %></h2>
+              <p class="text-gray-700 mb-3">💲 <span class="font-semibold"><%= producto.precio %></span></p>
+              <label class="block text-sm text-gray-600">
+                Cantidad:
+                <input
+                  type="number"
+                  name="cantidad_<%= producto.id %>"
+                  min="0"
+                  value="0"
+                  class="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+              </label>
+            </div>
+          <% }) %>
+        <% } %>
+      </div>
+
+      <!-- Carrito (lado derecho, solo decorativo por ahora) -->
+      <div class="bg-white rounded-2xl shadow-lg p-6 border border-blue-200 h-fit">
+        <h2 class="text-2xl font-bold text-blue-800 mb-4">🧺 Mi Carrito</h2>
+        <p class="text-gray-600">Aquí verás un resumen de tu pedido cuando lo envíes 😄</p>
+        <div class="mt-6">
+          <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full shadow-md transition duration-300">
+            🧾 Enviar Pedido
+          </button>
+        </div>
+      </div>
+
+    </form>
+  </div>
+</body>
+</html>
