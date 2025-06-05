@@ -125,12 +125,30 @@ app.post('/logout', (req, res) => {
 app.get('/cliente/pedido', isCliente, async (req, res) => {
   try {
     const productos = await pool.query('SELECT * FROM productos');
-    res.render('pedido', { user: req.user, productos: productos.rows });
+
+    const pedidos = await pool.query(
+      `SELECT p.id, p.estado, p.fecha,
+       json_agg(json_build_object('nombre', pr.nombre, 'cantidad', dp.cantidad)) as productos
+       FROM pedidos p
+       JOIN detalle_pedido dp ON dp.pedido_id = p.id
+       JOIN productos pr ON pr.id = dp.producto_id
+       WHERE p.usuario_id = $1
+       GROUP BY p.id
+       ORDER BY p.fecha DESC`,
+      [req.user.id]
+    );
+
+    res.render('pedido', {
+      user: req.user,
+      productos: productos.rows,
+      pedidos: pedidos.rows // 👈 esto es lo que te falta
+    });
   } catch (error) {
-    console.error('Error cargando productos:', error);
-    res.send('Error cargando productos');
+    console.error('Error cargando productos y pedidos:', error);
+    res.send('Error cargando información para hacer pedido');
   }
 });
+
 
 // Mostrar el último pedido con productos y cantidades para el cliente
 app.get('/cliente/pedido/detalle', isCliente, async (req, res) => {

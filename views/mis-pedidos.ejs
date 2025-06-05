@@ -23,9 +23,13 @@
             </div>
             <div class="px-3 py-1 rounded-full font-semibold text-white
               <%= pedido.estado === 'pendiente' ? 'bg-yellow-500' : '' %>
-              <%= pedido.estado === 'entregado' ? 'bg-green-600' : '' %>
-              <%= pedido.estado === 'cancelado' ? 'bg-red-600' : '' %>">
-              <%= pedido.estado.charAt(0).toUpperCase() + pedido.estado.slice(1) %>
+              <%= pedido.estado === 'En proceso' ? 'bg-blue-500' : '' %>
+              <%= pedido.estado === 'Despachado' ? 'bg-green-600' : '' %>
+              <%= pedido.estado === 'En preparación' ? 'bg-cyan-600' : '' %>
+              <%= pedido.estado === 'En camino' ? 'bg-purple-600' : '' %>
+              <%= pedido.estado === 'Retrasado' ? 'bg-orange-700' : '' %>
+              <%= pedido.estado === 'Devuelto' ? 'bg-gray-700' : '' %>">
+              <%= pedido.estado %>
             </div>
           </div>
           <ul class="divide-y divide-gray-200">
