@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Planes - MasAgua</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gradient-to-br from-blue-100 via-white to-blue-200 min-h-screen flex flex-col items-center justify-start py-12">
+  <div class="w-full max-w-7xl px-6">
+    <h1 class="text-4xl font-bold text-center text-blue-800 mb-10 drop-shadow">🛒 Selecciona un Plan</h1>
+
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-10">
+      <% if (planes.length === 0) { %>
+        <p class="text-center text-gray-600 col-span-full">No hay planes disponibles 😢</p>
+      <% } else { %>
+        <% planes.forEach(plan => { %>
+          <form action="/empresa/planes" method="POST" class="bg-white rounded-2xl shadow-lg p-6 hover:shadow-2xl transition duration-300 border border-blue-200 flex flex-col justify-between">
+            <h2 class="text-xl font-bold text-blue-800 mb-2"><%= plan.nombre %></h2>
+            <p class="text-gray-700 mb-3">💲 <span class="font-semibold"><%= plan.precio %></span></p>
+            <p class="text-gray-700 mb-3"><%= plan.descripcion %></p>
+            <input type="hidden" name="plan_id" value="<%= plan.id %>">
+            <button type="submit" class="mt-auto w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full shadow-md transition duration-300">
+              Contratar Plan
+            </button>
+          </form>
+        <% }) %>
+      <% } %>
+    </div>
+  </div>
+</body>
+</html>

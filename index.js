@@ -4,20 +4,22 @@ const session = require('express-session');
 const bcrypt = require('bcrypt');
 const pool = require('./db');
 
+// Rutas
 const adminRoutes = require('./routes/admin');
 const clienteRoutes = require('./routes/cliente');
 const empresaRoutes = require('./routes/empresa');
 const flotaRoutes = require('./routes/flota');
 const choferesRouter = require('./routes/choferes');
 
+
 const app = express();
 const PORT = 3000;
 
-// Motor de vistas
+// --- Motor de vistas ---
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// Middlewares base
+// --- Middlewares base ---
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -40,20 +42,23 @@ app.use(async (req, res, next) => {
   next();
 });
 
-// Middleware para validar rol cliente
+// --- Middleware para roles ---
 function isCliente(req, res, next) {
   if (req.user && req.user.rol === 'cliente') return next();
   return res.redirect('/login.html');
 }
 
-// Middleware para validar rol admin
 function isAdmin(req, res, next) {
   if (req.user && req.user.rol === 'admin') return next();
   return res.redirect('/login.html');
 }
 
-// --- Rutas registro, login, logout ---
+function isEmpresa(req, res, next) {
+  if (req.user && req.user.tipo === 'empresa') return next();
+  return res.redirect('/login.html');
+}
 
+// --- Rutas de autenticación ---
 app.get('/register', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'register.html'));
 });
@@ -119,13 +124,10 @@ app.post('/logout', (req, res) => {
   });
 });
 
-// --- Rutas pedidos para cliente ---
-
-// Mostrar página para hacer pedido con productos
+// --- Rutas para cliente ---
 app.get('/cliente/pedido', isCliente, async (req, res) => {
   try {
     const productos = await pool.query('SELECT * FROM productos');
-
     const pedidos = await pool.query(
       `SELECT p.id, p.estado, p.fecha,
        json_agg(json_build_object('nombre', pr.nombre, 'cantidad', dp.cantidad)) as productos
@@ -137,11 +139,10 @@ app.get('/cliente/pedido', isCliente, async (req, res) => {
        ORDER BY p.fecha DESC`,
       [req.user.id]
     );
-
     res.render('pedido', {
       user: req.user,
       productos: productos.rows,
-      pedidos: pedidos.rows // 👈 esto es lo que te falta
+      pedidos: pedidos.rows
     });
   } catch (error) {
     console.error('Error cargando productos y pedidos:', error);
@@ -149,59 +150,13 @@ app.get('/cliente/pedido', isCliente, async (req, res) => {
   }
 });
 
-
-// Mostrar el último pedido con productos y cantidades para el cliente
-app.get('/cliente/pedido/detalle', isCliente, async (req, res) => {
-  try {
-    // Obtener el último pedido del usuario
-    const pedidoResult = await pool.query(
-      `SELECT id, estado, fecha 
-       FROM pedidos 
-       WHERE usuario_id = $1 
-       ORDER BY fecha DESC 
-       LIMIT 1`,
-      [req.user.id]
-    );
-
-    if (pedidoResult.rows.length === 0) {
-      // No hay pedidos para mostrar
-      return res.render('pedido-detalle', { pedido: null, productos: [] });
-    }
-
-    const pedido = pedidoResult.rows[0];
-
-    // Obtener productos con cantidad para ese pedido
-    const productosResult = await pool.query(
-      `SELECT p.nombre, p.descripcion, p.precio, p.imagen, dp.cantidad
-       FROM detalle_pedido dp
-       JOIN productos p ON dp.producto_id = p.id
-       WHERE dp.pedido_id = $1`,
-      [pedido.id]
-    );
-
-    res.render('pedido-detalle', {
-      pedido,
-      productos: productosResult.rows,
-      user: req.user
-    });
-  } catch (error) {
-    console.error('Error cargando pedido detalle:', error);
-    res.status(500).send('Error cargando pedido');
-  }
-});
-
-
-// Procesar pedido enviado desde formulario
 app.post('/cliente/pedido', isCliente, async (req, res) => {
   try {
-    // Crear pedido pendiente
     const result = await pool.query(
       'INSERT INTO pedidos (usuario_id, estado) VALUES ($1, $2) RETURNING id',
       [req.user.id, 'pendiente']
     );
     const pedidoId = result.rows[0].id;
-
-    // Insertar detalle del pedido con cantidades recibidas del formulario
     const productos = await pool.query('SELECT id FROM productos');
     for (const producto of productos.rows) {
       const cantidad = parseInt(req.body[`cantidad_${producto.id}`]) || 0;
@@ -212,7 +167,6 @@ app.post('/cliente/pedido', isCliente, async (req, res) => {
         );
       }
     }
-
     res.redirect('/cliente/mis-pedidos');
   } catch (error) {
     console.error('Error al guardar pedido:', error);
@@ -220,30 +174,7 @@ app.post('/cliente/pedido', isCliente, async (req, res) => {
   }
 });
 
-// Mostrar pedidos del cliente con estado real
-app.get('/cliente/mis-pedidos', isCliente, async (req, res) => {
-  try {
-    const pedidos = await pool.query(
-      `SELECT p.id, p.estado, p.fecha,
-       json_agg(json_build_object('nombre', pr.nombre, 'cantidad', dp.cantidad)) as productos
-       FROM pedidos p
-       JOIN detalle_pedido dp ON dp.pedido_id = p.id
-       JOIN productos pr ON pr.id = dp.producto_id
-       WHERE p.usuario_id = $1
-       GROUP BY p.id
-       ORDER BY p.fecha DESC`,
-      [req.user.id]
-    );
-    res.render('mis-pedidos', { pedidos: pedidos.rows, user: req.user });
-
-  } catch (error) {
-    console.error('Error cargando pedidos:', error);
-    res.send('Error cargando pedidos');
-  }
-});
-
-// --- Rutas admin para gestionar pedidos ---
-
+// --- Rutas para admin ---
 app.get('/admin/pedidos', isAdmin, async (req, res) => {
   try {
     const pedidos = await pool.query(
@@ -263,28 +194,14 @@ app.get('/admin/pedidos', isAdmin, async (req, res) => {
   }
 });
 
-app.post('/admin/pedidos/:id/estado', isAdmin, async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { estado } = req.body;
-    await pool.query('UPDATE pedidos SET estado = $1 WHERE id = $2', [estado, id]);
-    res.redirect('/admin/pedidos');
-  } catch (error) {
-    console.error('Error actualizando estado pedido:', error);
-    res.send('Error actualizando estado pedido');
-  }
-});
-
-// --- Rutas de otros módulos ---
-
+// --- Rutas importadas de módulos ---
 app.use('/admin', adminRoutes);
 app.use('/cliente', clienteRoutes);
 app.use('/empresa', empresaRoutes);
 app.use('/flota', flotaRoutes);
 app.use('/choferes', choferesRouter);
 
-
-// Ruta para probar conexión DB
+// --- Ruta para probar conexión DB ---
 app.get('/probar-db', async (req, res) => {
   try {
     const resultado = await pool.query('SELECT NOW()');
@@ -295,7 +212,7 @@ app.get('/probar-db', async (req, res) => {
   }
 });
 
-// Iniciar servidor
+// --- Iniciar servidor ---
 app.listen(PORT, () => {
   console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
 });

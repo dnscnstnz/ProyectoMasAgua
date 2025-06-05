@@ -58,6 +58,46 @@ exports.getPedidos = async (req, res) => {
   }
 };
 
+exports.getPlanesContratados = async (req, res) => {
+  try {
+    const planesContratadosQuery = `
+      SELECT 
+        pc.id,
+        u.nombre AS cliente_nombre,
+        p.nombre AS plan_nombre,
+        pc.estado,
+        pc.fecha_contratacion
+      FROM planes_contratados pc
+      JOIN usuarios u ON pc.usuario_id = u.id
+      JOIN planes p ON pc.plan_id = p.id
+      ORDER BY pc.id DESC
+    `;
+
+    const { rows } = await pool.query(planesContratadosQuery);
+
+    res.render('admin-planes', { planesContratados: rows, user: req.user }); // <-- ojo al nombre y datos
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error al cargar planes contratados');
+  }
+};
+
+
+exports.cambiarEstadoPlanContratado = async (req, res) => {
+  const { id } = req.params;
+  const { estado } = req.body;
+
+  try {
+    await pool.query('UPDATE planes_contratados SET estado = $1 WHERE id = $2', [estado, id]);
+    res.redirect('/admin/planes');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error actualizando estado del plan contratado');
+  }
+};
+
+
+
 exports.cambiarEstadoPedido = async (req, res) => {
   const { id } = req.params;
   const { estado } = req.body;

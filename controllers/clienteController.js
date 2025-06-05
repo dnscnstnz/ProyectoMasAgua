@@ -1,9 +1,56 @@
-// controllers/clienteController.js
-const pool = require('../db'); // Ajusta según tu configuración de base de datos
+const pool = require('../db');
 
 exports.getClienteDashboard = (req, res) => {
   res.render('cliente', { user: req.user });
 };
+
+exports.getPedidoForm = async (req, res) => {
+  try {
+    const { rows: productos } = await pool.query('SELECT * FROM productos');
+    res.render('pedido', { user: req.user, productos });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error al cargar productos');
+  }
+};
+
+exports.crearPedido = async (req, res) => {
+  try {
+    const productosSeleccionados = [];
+    for (const key in req.body) {
+      if (key.startsWith('cantidad_')) {
+        const idProducto = key.split('_')[1];
+        const cantidad = parseInt(req.body[key], 10);
+        if (cantidad > 0) {
+          productosSeleccionados.push({ idProducto, cantidad });
+        }
+      }
+    }
+
+    if (productosSeleccionados.length === 0) {
+      return res.redirect('/cliente/pedido');
+    }
+
+    const resultado = await pool.query(
+      'INSERT INTO pedidos (id_usuario, fecha, estado) VALUES ($1, NOW(), $2) RETURNING id',
+      [req.user.id, 'pendiente']
+    );
+    const idPedido = resultado.rows[0].id;
+
+    for (const prod of productosSeleccionados) {
+      await pool.query(
+        'INSERT INTO detalle_pedido (pedido_id, producto_id, cantidad) VALUES ($1, $2, $3)',
+        [idPedido, prod.idProducto, prod.cantidad]
+      );
+    }
+
+    res.redirect('/cliente/mis-pedidos');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error al crear pedido');
+  }
+};
+
 
 exports.verPedidos = async (req, res) => {
   try {
@@ -13,11 +60,11 @@ exports.verPedidos = async (req, res) => {
         p.fecha,
         p.estado,
         pr.nombre AS producto_nombre,
-        pp.cantidad
+        dp.cantidad
       FROM pedidos p
-      JOIN pedido_producto pp ON p.id = pp.id_pedido
-      JOIN productos pr ON pp.id_producto = pr.id
-      WHERE p.id_usuario = $1
+      JOIN detalle_pedido dp ON p.id = dp.pedido_id
+      JOIN productos pr ON dp.producto_id = pr.id
+      WHERE p.usuario_id = $1
       ORDER BY p.fecha DESC
     `;
 
@@ -43,9 +90,9 @@ exports.verPedidos = async (req, res) => {
 
     const pedidos = Array.from(pedidosMap.values());
 
-    res.render('cliente/pedidos', { user: req.user, pedidos });
+    res.render('mis-pedidos', { user: req.user, pedidos });
   } catch (error) {
-    console.error(error);
+    console.error('ERROR al cargar pedidos:', error);
     res.status(500).send('Error cargando tus pedidos');
   }
 };

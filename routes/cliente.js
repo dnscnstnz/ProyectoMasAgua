@@ -1,11 +1,11 @@
-// routes/cliente.js
 const express = require('express');
 const router = express.Router();
-
 const clienteController = require('../controllers/clienteController');
-const { estaLogueado } = require('../middlewares/authMiddleware');
+const { estaLogueado, isCliente } = require('../middlewares/authMiddleware');
 
-router.get('/', estaLogueado, clienteController.getClienteDashboard);
-router.get('/pedidos', estaLogueado, clienteController.verPedidos);
+router.get('/', estaLogueado, isCliente, clienteController.getClienteDashboard);
+router.get('/pedido', estaLogueado, isCliente, clienteController.getPedidoForm);
+router.post('/pedido', estaLogueado, isCliente, clienteController.crearPedido);
+router.get('/mis-pedidos', estaLogueado, isCliente, clienteController.verPedidos);
 
 module.exports = router;
