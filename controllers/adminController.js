@@ -75,13 +75,12 @@ exports.getPlanesContratados = async (req, res) => {
 
     const { rows } = await pool.query(planesContratadosQuery);
 
-    res.render('admin-planes', { planesContratados: rows, user: req.user }); // <-- ojo al nombre y datos
+    res.render('admin-planes', { planesContratados: rows, user: req.user });
   } catch (error) {
     console.error(error);
     res.status(500).send('Error al cargar planes contratados');
   }
 };
-
 
 exports.cambiarEstadoPlanContratado = async (req, res) => {
   const { id } = req.params;
@@ -96,8 +95,6 @@ exports.cambiarEstadoPlanContratado = async (req, res) => {
   }
 };
 
-
-
 exports.cambiarEstadoPedido = async (req, res) => {
   const { id } = req.params;
   const { estado } = req.body;
@@ -108,5 +105,48 @@ exports.cambiarEstadoPedido = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).send('Error actualizando estado del pedido');
+  }
+};
+
+// Mostrar formulario + rutas existentes
+exports.verRutas = async (req, res) => {
+  try {
+    const zonas = await pool.query('SELECT * FROM zonas');
+    const choferes = await pool.query('SELECT * FROM choferes');
+    const vehiculos = await pool.query('SELECT * FROM vehiculos');
+    const rutas = await pool.query(`
+      SELECT rutas.*, zonas.nombre AS zona, choferes.nombre AS chofer, vehiculos.patente AS vehiculo
+      FROM rutas
+      JOIN zonas ON rutas.id_zona = zonas.id
+      JOIN choferes ON rutas.id_chofer = choferes.id
+      JOIN vehiculos ON rutas.id_vehiculo = vehiculos.id
+      ORDER BY fecha_programada DESC
+    `);
+
+    res.render('admin-rutas', {
+      zonas: zonas.rows,
+      choferes: choferes.rows,
+      vehiculos: vehiculos.rows,
+      rutas: rutas.rows
+    });
+  } catch (error) {
+    console.error('Error cargando rutas:', error);
+    res.status(500).send('Error al cargar rutas');
+  }
+};
+
+exports.crearRuta = async (req, res) => {
+  const { id_zona, id_chofer, id_vehiculo, direccion_inicio, direccion_fin, fecha_programada } = req.body;
+
+  try {
+    await pool.query(
+      `INSERT INTO rutas (id_zona, id_chofer, id_vehiculo, direccion_inicio, direccion_fin, fecha_programada)
+       VALUES ($1, $2, $3, $4, $5, $6)`,
+      [id_zona, id_chofer, id_vehiculo, direccion_inicio, direccion_fin, fecha_programada]
+    );
+    res.redirect('/admin/rutas');
+  } catch (error) {
+    console.error('Error al guardar ruta:', error);
+    res.status(500).send('Error al guardar ruta');
   }
 };

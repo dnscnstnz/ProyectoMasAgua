@@ -30,36 +30,44 @@ exports.eliminarVehiculo = async (req, res) => {
     await pool.query('DELETE FROM vehiculos WHERE id = $1', [id]);
     res.redirect('/flota');
   } catch (error) {
-    console.error('Error al eliminar vehículo:', error);
-    res.send('No se pudo eliminar vehículo');
+    if (error.code === '23503') {
+      // Error de clave foránea, vehículo está asignado a un chofer
+      res.status(400).send('No se puede eliminar el vehículo porque está asignado a un chofer.');
+    } else {
+      console.error('Error al eliminar vehículo:', error);
+      res.status(500).send('No se pudo eliminar vehículo');
+    }
   }
 };
 
+
+// Mostrar formulario para editar vehículo
 exports.mostrarEditar = async (req, res) => {
   const id = req.params.id;
   try {
-    const result = await pool.query('SELECT * FROM vehiculos WHERE id = $1', [id]);
-    const vehiculo = result.rows[0];
-    res.render('editarVehiculo', { vehiculo }); // crearás esta vista más abajo
+    const resultado = await pool.query('SELECT * FROM vehiculos WHERE id = $1', [id]);
+    if (resultado.rows.length === 0) {
+      return res.status(404).send('Vehículo no encontrado');
+    }
+    res.render('editarVehiculo', { vehiculo: resultado.rows[0] });
   } catch (error) {
-    console.error('Error al obtener vehículo:', error);
-    res.status(500).send('Error del servidor');
+    console.error('Error al cargar vehículo para editar:', error);
+    res.send('Error al cargar vehículo');
   }
 };
 
+// Guardar cambios tras edición
 exports.editarVehiculo = async (req, res) => {
   const id = req.params.id;
   const { patente, marca, modelo, anio } = req.body;
-
   try {
     await pool.query(
-      'UPDATE vehiculos SET patente = $1, marca = $2, modelo = $3, anio = $4 WHERE id = $5',
+      `UPDATE vehiculos SET patente = $1, marca = $2, modelo = $3, anio = $4 WHERE id = $5`,
       [patente, marca, modelo, anio, id]
     );
     res.redirect('/flota');
   } catch (error) {
-    console.error('Error al editar vehículo:', error);
-    res.status(500).send('Error del servidor');
+    console.error('Error al actualizar vehículo:', error);
+    res.send('No se pudo actualizar vehículo');
   }
 };
-
