@@ -1,47 +1,51 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-  <title>Gestión de Choferes</title>
+  <meta charset="UTF-8" />
+  <title>Choferes</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="p-4">
-  <h1 class="text-2xl font-bold mb-4">Choferes de la Empresa</h1>
-
-  <!-- Formulario para agregar chofer -->
-  <form action="/choferes/agregar" method="POST" class="mb-6 space-x-2">
-    <input type="text" name="nombre" placeholder="Nombre completo" required class="border p-1">
-    <input type="text" name="rut" placeholder="RUT" required class="border p-1">
-    <input type="text" name="telefono" placeholder="Teléfono" class="border p-1">
-    <button type="submit" class="bg-blue-500 text-white px-4 py-1">Agregar</button>
-  </form>
-
-  <!-- Tabla de choferes -->
-  <table class="w-full border">
-    <thead>
-      <tr class="bg-gray-200">
-        <th class="p-2 border">Nombre</th>
-        <th class="p-2 border">RUT</th>
-        <th class="p-2 border">Teléfono</th>
-        <th class="p-2 border">Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% choferes.forEach(c => { %>
-        <tr>
-          <td class="border p-1"><%= c.nombre %></td>
-          <td class="border p-1"><%= c.rut %></td>
-          <td class="border p-1"><%= c.telefono %></td>
-          <td class="border p-1 flex gap-2">
-            <form action="/choferes/eliminar/<%= c.id %>" method="POST" onsubmit="return confirm('¿Eliminar este chofer?')">
-              <button class="text-red-500">Eliminar</button>
-            </form>
-          </td>
-          <td>
-            <a href="/choferes/editar/<%= c.id %>" class="text-blue-500">Editar</a>
-          </td>
-        </tr>
-      <% }) %>
-    </tbody>
-  </table>
+<body class="bg-gray-50 p-6">
+  <div class="max-w-6xl mx-auto bg-white p-6 rounded shadow">
+    <h1 class="text-3xl font-bold mb-6">Choferes de la Empresa</h1>
+    <a href="/choferes/nuevo" class="inline-block mb-4 bg-indigo-600 text-white py-2 px-4 rounded hover:bg-indigo-700 transition">Agregar nuevo chofer</a>
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200 border">
+        <thead class="bg-indigo-600 text-white">
+          <tr>
+            <th class="px-4 py-2 text-left">Nombre</th>
+            <th class="px-4 py-2 text-left">RUT</th>
+            <th class="px-4 py-2 text-left">Teléfono</th>
+            <th class="px-4 py-2 text-left">Dirección</th>
+            <th class="px-4 py-2 text-left">Comuna</th>
+            <th class="px-4 py-2 text-left">Zona ID</th>
+            <th class="px-4 py-2 text-left">Estado</th>
+            <th class="px-4 py-2 text-left">Vehículo ID</th>
+            <th class="px-4 py-2 text-left">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+          <% choferes.forEach(c => { %>
+            <tr class="hover:bg-gray-100">
+              <td class="px-4 py-2"><%= c.nombre %></td>
+              <td class="px-4 py-2"><%= c.rut %></td>
+              <td class="px-4 py-2"><%= c.telefono %></td>
+              <td class="px-4 py-2"><%= c.direccion || '-' %></td>
+              <td class="px-4 py-2"><%= c.comuna || '-' %></td>
+              <td class="px-4 py-2"><%= c.zona_id || '-' %></td>
+              <td class="px-4 py-2"><%= c.estado || '-' %></td>
+              <td class="px-4 py-2"><%= c.vehiculo_id || '-' %></td>
+              <td class="px-4 py-2 space-x-2">
+                <form action="/choferes/eliminar/<%= c.id %>" method="POST" onsubmit="return confirm('¿Eliminar este chofer?');" class="inline">
+                  <button type="submit" class="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700 transition">Eliminar</button>
+                </form>
+                <a href="/choferes/editar/<%= c.id %>" class="bg-yellow-400 px-2 py-1 rounded hover:bg-yellow-500 transition text-black">Editar</a>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </body>
 </html>
