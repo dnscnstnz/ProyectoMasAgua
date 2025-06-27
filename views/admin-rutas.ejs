@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Admin Rutas | MasAgua</title>
 
-  <!-- Carga Tailwind desde la CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -22,60 +21,64 @@
       }
     }
   </script>
-
 </head>
-<body class="bg-gray-50 font-sans p-8">
 
-  <section class="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-8 mb-12">
+<body class="bg-gray-50 font-sans p-8">
+  <section class="max-w-5xl mx-auto bg-white rounded-lg shadow-lg p-8 mb-12">
     <h2 class="text-3xl font-bold mb-6 text-primary">Crear Nueva Ruta</h2>
 
     <form action="/admin/rutas" method="POST" class="space-y-6">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="grid grid-cols-3 gap-4">
         <div>
-          <label for="id_zona" class="block mb-2 font-semibold text-gray-700">Zona</label>
-          <select id="id_zona" name="id_zona" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
-            <% zonas.forEach(z => { %>
-              <option value="<%= z.id %>"><%= z.nombre %></option>
-            <% }) %>
-          </select>
-        </div>
-
-        <div>
-          <label for="id_chofer" class="block mb-2 font-semibold text-gray-700">Chofer</label>
-          <select id="id_chofer" name="id_chofer" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
+          <label for="id_chofer" class="block mb-2 font-semibold text-gray-700">Chofer (Cobertura Comunas)</label>
+          <select id="id_chofer" name="id_chofer" required
+            class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
             <% choferes.forEach(c => { %>
-              <option value="<%= c.id %>"><%= c.nombre %></option>
+              <option value="<%= c.id %>"><%= c.nombre %> (<%= c.comunas_asignadas || 'Sin comunas asignadas' %>)</option>
             <% }) %>
           </select>
         </div>
 
         <div>
           <label for="id_vehiculo" class="block mb-2 font-semibold text-gray-700">Vehículo</label>
-          <select id="id_vehiculo" name="id_vehiculo" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
+          <select id="id_vehiculo" name="id_vehiculo" required
+            class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
             <% vehiculos.forEach(v => { %>
               <option value="<%= v.id %>"><%= v.patente %></option>
             <% }) %>
           </select>
         </div>
+
+        <div>
+          <label for="fecha_programada" class="block mb-2 font-semibold text-gray-700">Fecha Programada</label>
+          <input type="date" id="fecha_programada" name="fecha_programada" required
+            class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
+        </div>
       </div>
 
-      <div>
-        <label for="direccion_inicio" class="block mb-2 font-semibold text-gray-700">Dirección de Inicio</label>
-        <input type="text" id="direccion_inicio" name="direccion_inicio" required
-               class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Ej: Av. Siempre Viva 123" />
+      <div class="grid grid-cols-2 gap-4 mt-6">
+        <div>
+          <label for="direccion_inicio" class="block mb-2 font-semibold text-gray-700">Dirección Inicio</label>
+          <input type="text" id="direccion_inicio" name="direccion_inicio" placeholder="Ej: Calle Falsa 123" required
+            class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
+        </div>
+        <div>
+          <label for="direccion_fin" class="block mb-2 font-semibold text-gray-700">Dirección Fin</label>
+          <input type="text" id="direccion_fin" name="direccion_fin" placeholder="Ej: Avenida Siempre Viva 456" required
+            class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
+        </div>
       </div>
+      <div>
+  <label for="comunas" class="block mb-2 font-semibold text-gray-700">Comunas a cubrir</label>
+  <select id="comunas" name="comunas" multiple required
+    class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary h-48">
+    <% comunas.forEach(c => { %>
+      <option value="<%= c.id %>"><%= c.nombre %></option>
+    <% }) %>
+  </select>
+  <p class="text-xs text-gray-500 mt-1">Mantén presionado Ctrl para seleccionar varias.</p>
+</div>
 
-      <div>
-        <label for="direccion_fin" class="block mb-2 font-semibold text-gray-700">Dirección Final</label>
-        <input type="text" id="direccion_fin" name="direccion_fin" required
-               class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Ej: Calle Falsa 456" />
-      </div>
-
-      <div>
-        <label for="fecha_programada" class="block mb-2 font-semibold text-gray-700">Fecha Programada</label>
-        <input type="date" id="fecha_programada" name="fecha_programada" required
-               class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
-      </div>
 
       <button type="submit" class="w-full bg-primary text-white font-bold py-3 rounded hover:bg-primaryLight transition">
         Guardar Ruta
@@ -83,7 +86,7 @@
     </form>
   </section>
 
-  <section class="max-w-6xl mx-auto bg-white rounded-lg shadow p-6">
+  <section class="max-w-7xl mx-auto bg-white rounded-lg shadow p-6">
     <h3 class="text-2xl font-semibold mb-4 text-primary">Rutas Existentes</h3>
 
     <% if (!rutas.length) { %>
@@ -94,11 +97,11 @@
           <thead class="bg-primaryLight">
             <tr>
               <th class="border border-gray-300 px-4 py-2 text-left">ID</th>
-              <th class="border border-gray-300 px-4 py-2 text-left">Zona</th>
               <th class="border border-gray-300 px-4 py-2 text-left">Chofer</th>
+              <th class="border border-gray-300 px-4 py-2 text-left">Cobertura Comunas</th>
               <th class="border border-gray-300 px-4 py-2 text-left">Vehículo</th>
-              <th class="border border-gray-300 px-4 py-2 text-left">Inicio</th>
-              <th class="border border-gray-300 px-4 py-2 text-left">Final</th>
+              <th class="border border-gray-300 px-4 py-2 text-left">Dirección Inicio</th>
+              <th class="border border-gray-300 px-4 py-2 text-left">Dirección Fin</th>
               <th class="border border-gray-300 px-4 py-2 text-left">Fecha</th>
             </tr>
           </thead>
@@ -106,11 +109,11 @@
             <% rutas.forEach(ruta => { %>
               <tr class="even:bg-gray-50 hover:bg-primaryLight transition-colors">
                 <td class="border border-gray-300 px-4 py-2"><%= ruta.id %></td>
-                <td class="border border-gray-300 px-4 py-2"><%= ruta.zona %></td>
-                <td class="border border-gray-300 px-4 py-2"><%= ruta.chofer %></td>
-                <td class="border border-gray-300 px-4 py-2"><%= ruta.vehiculo %></td>
-                <td class="border border-gray-300 px-4 py-2"><%= ruta.direccion_inicio %></td>
-                <td class="border border-gray-300 px-4 py-2"><%= ruta.direccion_fin %></td>
+                <td class="border border-gray-300 px-4 py-2"><%= ruta.chofer || '-' %></td>
+                <td class="border border-gray-300 px-4 py-2"><%= ruta.comunas_asignadas || '-' %></td>
+                <td class="border border-gray-300 px-4 py-2"><%= ruta.vehiculo || '-' %></td>
+                <td class="border border-gray-300 px-4 py-2"><%= ruta.direccion_inicio || '-' %></td>
+                <td class="border border-gray-300 px-4 py-2"><%= ruta.direccion_fin || '-' %></td>
                 <td class="border border-gray-300 px-4 py-2"><%= new Date(ruta.fecha_programada).toLocaleDateString('es-CL') %></td>
               </tr>
             <% }) %>
@@ -119,6 +122,5 @@
       </div>
     <% } %>
   </section>
-
 </body>
 </html>

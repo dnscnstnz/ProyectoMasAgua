@@ -1,5 +1,6 @@
 const pool = require('../db');
 
+// Dashboard principal del admin
 exports.getDashboard = async (req, res) => {
   try {
     const usuarios = await pool.query('SELECT id, nombre, email, rol FROM usuarios ORDER BY id');
@@ -10,6 +11,7 @@ exports.getDashboard = async (req, res) => {
   }
 };
 
+// Pedidos
 exports.getPedidos = async (req, res) => {
   try {
     const pedidosQuery = `
@@ -26,12 +28,9 @@ exports.getPedidos = async (req, res) => {
       JOIN productos pr ON pp.id_producto = pr.id
       ORDER BY p.id DESC
     `;
-
     const { rows } = await pool.query(pedidosQuery);
 
-    // Agrupar productos por pedido
     const pedidosMap = new Map();
-
     rows.forEach(row => {
       const id = row.pedido_id;
       if (!pedidosMap.has(id)) {
@@ -50,7 +49,6 @@ exports.getPedidos = async (req, res) => {
     });
 
     const pedidos = Array.from(pedidosMap.values());
-
     res.render('admin/pedidos', { pedidos });
   } catch (error) {
     console.error(error);
@@ -58,6 +56,20 @@ exports.getPedidos = async (req, res) => {
   }
 };
 
+// Cambiar estado pedido
+exports.cambiarEstadoPedido = async (req, res) => {
+  const { id } = req.params;
+  const { estado } = req.body;
+  try {
+    await pool.query('UPDATE pedidos SET estado = $1 WHERE id = $2', [estado, id]);
+    res.redirect('/admin/pedidos');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error actualizando estado del pedido');
+  }
+};
+
+// Planes contratados
 exports.getPlanesContratados = async (req, res) => {
   try {
     const planesContratadosQuery = `
@@ -72,9 +84,7 @@ exports.getPlanesContratados = async (req, res) => {
       JOIN planes p ON pc.plan_id = p.id
       ORDER BY pc.id DESC
     `;
-
     const { rows } = await pool.query(planesContratadosQuery);
-
     res.render('admin-planes', { planesContratados: rows, user: req.user });
   } catch (error) {
     console.error(error);
@@ -85,7 +95,6 @@ exports.getPlanesContratados = async (req, res) => {
 exports.cambiarEstadoPlanContratado = async (req, res) => {
   const { id } = req.params;
   const { estado } = req.body;
-
   try {
     await pool.query('UPDATE planes_contratados SET estado = $1 WHERE id = $2', [estado, id]);
     res.redirect('/admin/planes');
@@ -95,55 +104,87 @@ exports.cambiarEstadoPlanContratado = async (req, res) => {
   }
 };
 
-exports.cambiarEstadoPedido = async (req, res) => {
-  const { id } = req.params;
-  const { estado } = req.body;
-
-  try {
-    await pool.query('UPDATE pedidos SET estado = $1 WHERE id = $2', [estado, id]);
-    res.redirect('/admin/pedidos');
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Error actualizando estado del pedido');
-  }
-};
+// === Rutas por comuna ===
 
 // Mostrar formulario + rutas existentes
 exports.verRutas = async (req, res) => {
   try {
-    const zonas = await pool.query('SELECT * FROM zonas');
-    const choferes = await pool.query('SELECT * FROM choferes');
-    const vehiculos = await pool.query('SELECT * FROM vehiculos');
-    const rutas = await pool.query(`
-      SELECT rutas.*, zonas.nombre AS zona, choferes.nombre AS chofer, vehiculos.patente AS vehiculo
-      FROM rutas
-      JOIN zonas ON rutas.id_zona = zonas.id
-      JOIN choferes ON rutas.id_chofer = choferes.id
-      JOIN vehiculos ON rutas.id_vehiculo = vehiculos.id
-      ORDER BY fecha_programada DESC
-    `);
+    const comunasResult = await pool.query('SELECT * FROM comunas ORDER BY nombre');
+    const comunas = comunasResult.rows;
 
-    res.render('admin-rutas', {
-      zonas: zonas.rows,
-      choferes: choferes.rows,
-      vehiculos: vehiculos.rows,
-      rutas: rutas.rows
+    const choferesResult = await pool.query(`
+      SELECT ch.*, 
+        STRING_AGG(c.nombre, ', ') AS comunas_asignadas
+      FROM choferes ch
+      LEFT JOIN chofer_comunas cc ON ch.id = cc.chofer_id
+      LEFT JOIN comunas c ON cc.comuna_id = c.id
+      GROUP BY ch.id
+      ORDER BY ch.nombre
+    `);
+    const choferes = choferesResult.rows;
+
+    const vehiculosResult = await pool.query('SELECT * FROM vehiculos ORDER BY patente');
+    const vehiculos = vehiculosResult.rows;
+
+    const rutasResult = await pool.query(`
+      SELECT 
+        r.id,
+        ch.nombre AS chofer,
+        v.patente AS vehiculo,
+        r.direccion_inicio,
+        r.direccion_fin,
+        r.fecha_programada
+      FROM rutas r
+      LEFT JOIN choferes ch ON r.id_chofer = ch.id
+      LEFT JOIN vehiculos v ON r.id_vehiculo = v.id
+      ORDER BY r.fecha_programada DESC
+    `);
+    const rutas = rutasResult.rows;
+
+    const comunasRutaResult = await pool.query(`
+      SELECT ruta_id, STRING_AGG(c.nombre, ', ') AS comunas
+      FROM comunas_ruta cr
+      JOIN comunas c ON cr.comuna_id = c.id
+      GROUP BY ruta_id
+    `);
+    const comunasPorRuta = {};
+    comunasRutaResult.rows.forEach(row => {
+      comunasPorRuta[row.ruta_id] = row.comunas;
     });
+
+    rutas.forEach(ruta => {
+      ruta.comunas_asignadas = comunasPorRuta[ruta.id] || '-';
+    });
+
+    res.render('admin-rutas', { comunas, choferes, vehiculos, rutas });
   } catch (error) {
     console.error('Error cargando rutas:', error);
     res.status(500).send('Error al cargar rutas');
   }
 };
 
+// Crear ruta nueva
 exports.crearRuta = async (req, res) => {
-  const { id_zona, id_chofer, id_vehiculo, direccion_inicio, direccion_fin, fecha_programada } = req.body;
-
   try {
-    await pool.query(
-      `INSERT INTO rutas (id_zona, id_chofer, id_vehiculo, direccion_inicio, direccion_fin, fecha_programada)
-       VALUES ($1, $2, $3, $4, $5, $6)`,
-      [id_zona, id_chofer, id_vehiculo, direccion_inicio, direccion_fin, fecha_programada]
+    const { id_chofer, id_vehiculo, direccion_inicio, direccion_fin, fecha_programada, comunas } = req.body;
+
+    const rutaResult = await pool.query(
+      `INSERT INTO rutas (id_chofer, id_vehiculo, direccion_inicio, direccion_fin, fecha_programada)
+       VALUES ($1, $2, $3, $4, $5) RETURNING id`,
+      [id_chofer, id_vehiculo, direccion_inicio, direccion_fin, fecha_programada]
     );
+
+    const rutaId = rutaResult.rows[0].id;
+
+    if (comunas && comunas.length > 0) {
+      const comunasArray = Array.isArray(comunas) ? comunas : [comunas];
+      const values = comunasArray.map((_, i) => `($1, $${i + 2})`).join(',');
+      await pool.query(
+        `INSERT INTO comunas_ruta (ruta_id, comuna_id) VALUES ${values}`,
+        [rutaId, ...comunasArray]
+      );
+    }
+
     res.redirect('/admin/rutas');
   } catch (error) {
     console.error('Error al guardar ruta:', error);

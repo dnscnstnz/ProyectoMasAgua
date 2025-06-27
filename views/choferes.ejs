@@ -18,7 +18,6 @@
             <th class="px-4 py-2 text-left">Teléfono</th>
             <th class="px-4 py-2 text-left">Dirección</th>
             <th class="px-4 py-2 text-left">Comuna</th>
-            <th class="px-4 py-2 text-left">Zona ID</th>
             <th class="px-4 py-2 text-left">Estado</th>
             <th class="px-4 py-2 text-left">Vehículo ID</th>
             <th class="px-4 py-2 text-left">Acciones</th>
@@ -31,16 +30,17 @@
               <td class="px-4 py-2"><%= c.rut %></td>
               <td class="px-4 py-2"><%= c.telefono %></td>
               <td class="px-4 py-2"><%= c.direccion || '-' %></td>
-              <td class="px-4 py-2"><%= c.comuna || '-' %></td>
-              <td class="px-4 py-2"><%= c.zona_id || '-' %></td>
+              <td class="px-4 py-2"><%= c.comunas_asignadas || '-' %></td>
+
               <td class="px-4 py-2"><%= c.estado || '-' %></td>
               <td class="px-4 py-2"><%= c.vehiculo_id || '-' %></td>
-              <td class="px-4 py-2 space-x-2">
-                <form action="/choferes/eliminar/<%= c.id %>" method="POST" onsubmit="return confirm('¿Eliminar este chofer?');" class="inline">
-                  <button type="submit" class="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700 transition">Eliminar</button>
-                </form>
-                <a href="/choferes/editar/<%= c.id %>" class="bg-yellow-400 px-2 py-1 rounded hover:bg-yellow-500 transition text-black">Editar</a>
-              </td>
+              <td class="px-4 py-2 flex space-x-2">
+  <form action="/choferes/eliminar/<%= c.id %>" method="POST" onsubmit="return confirm('¿Eliminar este chofer?');">
+    <button type="submit" class="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700 transition">Eliminar</button>
+  </form>
+  <a href="/choferes/editar/<%= c.id %>" class="bg-yellow-400 px-2 py-1 rounded hover:bg-yellow-500 transition text-black">Editar</a>
+</td>
+
             </tr>
           <% }) %>
         </tbody>
