@@ -96,3 +96,47 @@ exports.verPedidos = async (req, res) => {
     res.status(500).send('Error cargando tus pedidos');
   }
 };
+
+// Mostrar perfil del usuario
+exports.verPerfil = async (req, res) => {
+  try {
+    const { id } = req.user; // id del usuario logueado
+    const query = 'SELECT id, nombre, rut, direccion, telefono, email FROM usuarios WHERE id = $1';
+    const { rows } = await pool.query(query, [id]);
+    
+    if (rows.length === 0) {
+      return res.status(404).send('Usuario no encontrado');
+    }
+
+    res.render('editarCliente', { user: rows[0], query: req.query || {} });
+  } catch (error) {
+    console.error('Error al cargar perfil:', error);
+    res.status(500).send('Error al cargar perfil');
+  }
+};
+
+// Actualizar perfil
+exports.actualizarPerfil = async (req, res) => {
+  try {
+    const { id } = req.user;
+    const { nombre, rut, direccion, telefono, email } = req.body;
+
+    // Validación simple (puedes ampliar)
+    if (!nombre || !email) {
+      return res.status(400).send('Nombre y email son obligatorios');
+    }
+
+    const updateQuery = `
+      UPDATE usuarios SET nombre = $1, rut = $2, direccion = $3, telefono = $4, email = $5
+      WHERE id = $6
+    `;
+    await pool.query(updateQuery, [nombre, rut, direccion, telefono, email, id]);
+
+    // Redirigir con query para mostrar mensaje éxito
+    res.redirect('/cliente/perfil?success=true');
+  } catch (error) {
+    console.error('Error al actualizar perfil:', error);
+    res.status(500).send('Error al actualizar perfil');
+  }
+};
+

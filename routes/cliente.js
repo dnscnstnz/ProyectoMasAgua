@@ -8,4 +8,8 @@ router.get('/pedido', estaLogueado, isCliente, clienteController.getPedidoForm);
 router.post('/pedido', estaLogueado, isCliente, clienteController.crearPedido);
 router.get('/mis-pedidos', estaLogueado, isCliente, clienteController.verPedidos);
 
+// NUEVAS RUTAS PARA PERFIL
+router.get('/perfil', estaLogueado, isCliente, clienteController.verPerfil);
+router.post('/perfil', estaLogueado, isCliente, clienteController.actualizarPerfil);
+
 module.exports = router;

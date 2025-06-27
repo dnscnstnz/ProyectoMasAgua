@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Editar Perfil | MasAgua</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Manrope', 'sans-serif'] },
+          colors: { primary: '#00796b', primaryLight: '#48a999' }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-gray-50 font-sans p-8">
+  <section class="max-w-xl mx-auto bg-white rounded-lg shadow-lg p-8">
+    <h1 class="text-2xl font-bold mb-4 text-primary">Editar Perfil</h1>
+
+    <% if (query.success) { %>
+      <div class="bg-green-200 text-green-800 p-3 mb-4 rounded">
+        Perfil actualizado correctamente.
+      </div>
+    <% } %>
+<div class="mt-4 flex justify-between items-center">
+  <a href="/cliente" class="text-primary font-semibold hover:underline">
+    ← Volver al Inicio
+  </a>
+  
+</div>
+
+    <form action="/cliente/perfil" method="POST" class="space-y-6">
+      <div>
+        <label for="nombre" class="block font-semibold mb-1">Nombre</label>
+        <input type="text" id="nombre" name="nombre" required
+          class="w-full border rounded px-3 py-2" value="<%= user.nombre %>" />
+      </div>
+
+      <div>
+        <label for="rut" class="block font-semibold mb-1">RUT</label>
+        <input type="text" id="rut" name="rut"
+          class="w-full border rounded px-3 py-2" value="<%= user.rut || '' %>" />
+      </div>
+
+      <div>
+        <label for="direccion" class="block font-semibold mb-1">Dirección</label>
+        <input type="text" id="direccion" name="direccion"
+          class="w-full border rounded px-3 py-2" value="<%= user.direccion || '' %>" />
+      </div>
+
+      <div>
+        <label for="telefono" class="block font-semibold mb-1">Teléfono</label>
+        <input type="text" id="telefono" name="telefono"
+          class="w-full border rounded px-3 py-2" value="<%= user.telefono || '' %>" />
+      </div>
+
+      <div>
+        <label for="email" class="block font-semibold mb-1">Email</label>
+        <input type="email" id="email" name="email" required
+          class="w-full border rounded px-3 py-2" value="<%= user.email %>" />
+      </div>
+
+      <button type="submit" class="w-full bg-primary text-white font-bold py-3 rounded hover:bg-primaryLight transition">
+        Guardar Cambios
+      </button>
+    </form>
+  </section>
+</body>
+</html>

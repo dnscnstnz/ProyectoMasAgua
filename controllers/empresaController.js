@@ -54,3 +54,37 @@ exports.misPlanes = async (req, res) => {
     res.send('Error cargando tus planes');
   }
 };
+
+// Mostrar formulario de perfil con datos actuales (sin password)
+exports.getEditarPerfil = async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      `SELECT id, email, rol, tipo, nombre, rut, direccion, telefono 
+       FROM usuarios 
+       WHERE id = $1`, 
+      [req.user.id]
+    );
+    if (rows.length === 0) return res.status(404).send('Empresa no encontrada');
+    
+    res.render('editarEmpresa', { empresa: rows[0], user: req.user, query: req.query });
+  } catch (error) {
+    console.error('Error cargando perfil empresa:', error);
+    res.status(500).send('Error al cargar perfil');
+  }
+};
+
+// Actualizar datos del perfil
+exports.postEditarPerfil = async (req, res) => {
+  const { nombre, rut, direccion, telefono } = req.body;
+  try {
+    await pool.query(
+      `UPDATE usuarios SET nombre = $1, rut = $2, direccion = $3, telefono = $4 WHERE id = $5`,
+      [nombre, rut, direccion, telefono, req.user.id]
+    );
+    // Redirigir con query para mostrar mensaje de éxito
+    res.redirect('/empresa/perfil?success=1');
+  } catch (error) {
+    console.error('Error actualizando perfil empresa:', error);
+    res.status(500).send('Error al actualizar perfil');
+  }
+};
