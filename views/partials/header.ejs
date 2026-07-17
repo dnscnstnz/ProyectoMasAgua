@@ -1,0 +1,36 @@
+﻿<header>
+  <div class="home-shell flex items-center justify-between py-4">
+    <a href="/" class="brand-title">
+      <span class="icon-pill"><i data-lucide="droplets"></i></span>
+      MasAgua
+    </a>
+
+    <nav>
+      <a href="/">Inicio</a>
+      <% if (typeof user !== 'undefined' && user) { %>
+        <% if (user.rol === 'admin') { %>
+          <a href="/admin">Panel</a>
+          <a href="/admin/pedidos">Pedidos</a>
+          <a href="/admin/planes">Planes</a>
+          <a href="/admin/reportes">Reportes</a>
+        <% } else if (user.tipo === 'empresa') { %>
+          <a href="/empresa">Panel</a>
+          <a href="/empresa/planes">Planes</a>
+          <a href="/empresa/mis-planes">Mis planes</a>
+        <% } else { %>
+          <a href="/cliente">Panel</a>
+          <a href="/cliente/pedido">Pedido</a>
+          <a href="/cliente/mis-pedidos">Mis pedidos</a>
+        <% } %>
+        <form method="POST" action="/logout" class="logout-form">
+          <button type="submit" class="logout-button">Cerrar sesion</button>
+        </form>
+      <% } else { %>
+        <a href="/productos.html">Productos</a>
+        <a href="/login.html">Iniciar sesion</a>
+      <% } %>
+    </nav>
+  </div>
+</header>
+
+

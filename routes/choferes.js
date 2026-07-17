@@ -1,23 +1,24 @@
 const express = require('express');
 const router = express.Router();
 const choferesController = require('../controllers/choferesController');
+const { estaLogueado, esAdmin } = require('../middlewares/authMiddleware');
 
 // Listar choferes
-router.get('/', choferesController.listarChoferes);
+router.get('/', estaLogueado, esAdmin, choferesController.listarChoferes);
 
 // Mostrar formulario agregar
-router.get('/nuevo', choferesController.formularioNuevoChofer);
+router.get('/nuevo', estaLogueado, esAdmin, choferesController.formularioNuevoChofer);
 
 // Procesar agregar
-router.post('/nuevo', choferesController.guardarNuevoChofer);
+router.post('/nuevo', estaLogueado, esAdmin, choferesController.guardarNuevoChofer);
 
 // Mostrar formulario editar
-router.get('/editar/:id', choferesController.formularioEditarChofer);
+router.get('/editar/:id', estaLogueado, esAdmin, choferesController.formularioEditarChofer);
 
 // Procesar editar
-router.post('/editar/:id', choferesController.guardarChoferEditado);
+router.post('/editar/:id', estaLogueado, esAdmin, choferesController.guardarChoferEditado);
 
 // Eliminar chofer
-router.post('/eliminar/:id', choferesController.eliminarChofer);
+router.post('/eliminar/:id', estaLogueado, esAdmin, choferesController.eliminarChofer);
 
 module.exports = router;

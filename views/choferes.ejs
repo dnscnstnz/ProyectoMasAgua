@@ -1,51 +1,64 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <title>Choferes</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-50 p-6">
-  <div class="max-w-6xl mx-auto bg-white p-6 rounded shadow">
-    <h1 class="text-3xl font-bold mb-6">Choferes de la Empresa</h1>
-    <a href="/choferes/nuevo" class="inline-block mb-4 bg-indigo-600 text-white py-2 px-4 rounded hover:bg-indigo-700 transition">Agregar nuevo chofer</a>
-    <div class="overflow-x-auto">
-      <table class="min-w-full divide-y divide-gray-200 border">
-        <thead class="bg-indigo-600 text-white">
-          <tr>
-            <th class="px-4 py-2 text-left">Nombre</th>
-            <th class="px-4 py-2 text-left">RUT</th>
-            <th class="px-4 py-2 text-left">Teléfono</th>
-            <th class="px-4 py-2 text-left">Dirección</th>
-            <th class="px-4 py-2 text-left">Comuna</th>
-            <th class="px-4 py-2 text-left">Estado</th>
-            <th class="px-4 py-2 text-left">Vehículo ID</th>
-            <th class="px-4 py-2 text-left">Acciones</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-200">
-          <% choferes.forEach(c => { %>
-            <tr class="hover:bg-gray-100">
-              <td class="px-4 py-2"><%= c.nombre %></td>
-              <td class="px-4 py-2"><%= c.rut %></td>
-              <td class="px-4 py-2"><%= c.telefono %></td>
-              <td class="px-4 py-2"><%= c.direccion || '-' %></td>
-              <td class="px-4 py-2"><%= c.comunas_asignadas || '-' %></td>
+<%- include('partials/head', { title: "Choferes | MasAgua" }) %>
+<body>
+  <%- include('partials/header') %>
 
-              <td class="px-4 py-2"><%= c.estado || '-' %></td>
-              <td class="px-4 py-2"><%= c.vehiculo_id || '-' %></td>
-              <td class="px-4 py-2 flex space-x-2">
-  <form action="/choferes/eliminar/<%= c.id %>" method="POST" onsubmit="return confirm('¿Eliminar este chofer?');">
-    <button type="submit" class="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700 transition">Eliminar</button>
-  </form>
-  <a href="/choferes/editar/<%= c.id %>" class="bg-yellow-400 px-2 py-1 rounded hover:bg-yellow-500 transition text-black">Editar</a>
-</td>
+  <main class="page-shell">
+    <section class="admin-hero">
+      <div>
+        <p class="section-label">Logistica</p>
+        <h1>Choferes</h1>
+        <p class="muted">Administra choferes, zona base y comunas de cobertura coherentes.</p>
+      </div>
+      <a href="/choferes/nuevo" class="btn"><i data-lucide="user-plus"></i> Agregar chofer</a>
+    </section>
 
+    <section>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>RUT</th>
+              <th>Telefono</th>
+              <th>Zona base</th>
+              <th>Comunas</th>
+              <th>Vehiculo</th>
+              <th>Estado</th>
+              <th>Acciones</th>
             </tr>
-          <% }) %>
-        </tbody>
-      </table>
-    </div>
-  </div>
+          </thead>
+          <tbody>
+            <% if (!choferes || choferes.length === 0) { %>
+              <tr><td colspan="8">No hay choferes registrados.</td></tr>
+            <% } else { %>
+              <% choferes.forEach(c => { %>
+                <tr>
+                  <td><strong><%= c.nombre %></strong><br><small><%= c.direccion || '-' %></small></td>
+                  <td><%= c.rut %></td>
+                  <td><%= c.telefono || '-' %></td>
+                  <td><span class="badge"><%= c.zona_nombre || 'Sin zona' %></span></td>
+                  <td><%= c.comunas_asignadas || '-' %></td>
+                  <td><%= c.vehiculo_patente || c.vehiculo_id || '-' %></td>
+                  <td><span class="badge"><%= c.estado || '-' %></span></td>
+                  <td>
+                    <div class="row-actions">
+                      <a href="/choferes/editar/<%= c.id %>" class="btn btn-secondary"><i data-lucide="pencil"></i> Editar</a>
+                      <form action="/choferes/eliminar/<%= c.id %>" method="POST" class="inline-form" onsubmit="return confirm('¿Eliminar este chofer?');">
+                        <button type="submit" class="btn-danger"><i data-lucide="trash-2"></i> Eliminar</button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+              <% }) %>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <%- include('partials/footer') %>
 </body>
 </html>

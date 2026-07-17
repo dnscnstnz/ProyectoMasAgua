@@ -6,16 +6,18 @@ exports.getClienteDashboard = (req, res) => {
 
 exports.getPedidoForm = async (req, res) => {
   try {
-    const { rows: productos } = await pool.query('SELECT * FROM productos');
-    res.render('pedido', { user: req.user, productos });
+    const { rows: productos } = await pool.query('SELECT * FROM productos ORDER BY nombre');
+    const { rows: comunas } = await pool.query('SELECT id, nombre FROM comunas ORDER BY nombre');
+    res.render('pedido', { user: req.user, productos, comunas });
   } catch (error) {
     console.error(error);
-    res.status(500).send('Error al cargar productos');
+    res.status(500).send('Error al cargar formulario de pedido');
   }
 };
 
 exports.crearPedido = async (req, res) => {
   try {
+    const { direccion_entrega, comuna_id } = req.body;
     const productosSeleccionados = [];
     for (const key in req.body) {
       if (key.startsWith('cantidad_')) {
@@ -31,9 +33,20 @@ exports.crearPedido = async (req, res) => {
       return res.redirect('/cliente/pedido');
     }
 
+    if (!direccion_entrega || !String(direccion_entrega).trim() || !comuna_id) {
+      return res.status(400).send('Direccion de entrega y comuna son obligatorias');
+    }
+
+    const comunaResult = await pool.query('SELECT id FROM comunas WHERE id = $1', [comuna_id]);
+    if (comunaResult.rows.length === 0) {
+      return res.status(400).send('La comuna seleccionada no es valida');
+    }
+
     const resultado = await pool.query(
-      'INSERT INTO pedidos (id_usuario, fecha, estado) VALUES ($1, NOW(), $2) RETURNING id',
-      [req.user.id, 'pendiente']
+      `INSERT INTO pedidos (usuario_id, fecha, estado, direccion_entrega, comuna_id)
+       VALUES ($1, NOW(), $2, $3, $4)
+       RETURNING id`,
+      [req.user.id, 'pendiente', String(direccion_entrega).trim(), comuna_id]
     );
     const idPedido = resultado.rows[0].id;
 
@@ -139,4 +152,3 @@ exports.actualizarPerfil = async (req, res) => {
     res.status(500).send('Error al actualizar perfil');
   }
 };
-

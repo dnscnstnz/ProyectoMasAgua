@@ -1,49 +1,109 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Flota de Vehículos</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="p-4">
-  <h1 class="text-2xl font-bold mb-4">Flota de Vehículos</h1>
+﻿<!DOCTYPE html>
+<html lang="es">
+<%- include('partials/head', { title: "Flota de Vehiculos | MasAgua" }) %>
+<body>
+  <%- include('partials/header') %>
 
-  <form action="/flota/agregar" method="POST" class="mb-6 space-x-2">
-    <input type="text" name="patente" placeholder="Patente" required class="border p-1">
-    <input type="text" name="marca" placeholder="Marca" class="border p-1">
-    <input type="text" name="modelo" placeholder="Modelo" class="border p-1">
-    <input type="number" name="anio" placeholder="Año" class="border p-1">
-    <button type="submit" class="bg-blue-500 text-white px-4 py-1">Agregar</button>
-  </form>
+  <main class="page-shell">
+    <section class="admin-hero">
+      <div>
+        <p class="section-label">Operaciones</p>
+        <h1>Flota de vehiculos</h1>
+        <p class="muted">Registra y administra los vehiculos disponibles para las entregas de MasAgua.</p>
+      </div>
+      <a href="/admin" class="btn btn-secondary"><i data-lucide="arrow-left"></i> Volver al panel</a>
+    </section>
 
-  <table class="w-full border">
-    <thead>
-      <tr class="bg-gray-200">
-        <th class="p-2 border">Patente</th>
-        <th class="p-2 border">Marca</th>
-        <th class="p-2 border">Modelo</th>
-        <th class="p-2 border">Año</th>
-        <th class="p-2 border">Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% vehiculos.forEach(v => { %>
-        <tr>
-          <td class="border p-1"><%= v.patente %></td>
-          <td class="border p-1"><%= v.marca %></td>
-          <td class="border p-1"><%= v.modelo %></td>
-          <td class="border p-1"><%= v.anio %></td>
-          <td class="border p-1">
-            <form action="/flota/eliminar/<%= v.id %>" method="POST" onsubmit="return confirm('¿Eliminar este vehículo?')">
-              <button class="text-red-500">Eliminar</button>
-            </form>
-          </td>
-          <td class="border p-1">
-            <a href="/flota/editar/<%= v.id %>" class="text-blue-500">Editar</a>
-          </td>
+    <section class="fleet-layout">
+      <article class="app-card fleet-form-card">
+        <div class="section-heading">
+          <p class="section-label">Nuevo vehiculo</p>
+          <h2>Agregar a la flota</h2>
+          <p class="muted">Usa una patente unica para evitar duplicados.</p>
+        </div>
 
-        </tr>
-      <% }) %>
-    </tbody>
-  </table>
+        <form action="/flota/agregar" method="POST" class="fleet-form">
+          <div class="form-grid">
+            <label>
+              Patente
+              <input type="text" name="patente" placeholder="Ej: MSAG10" maxlength="20" required autocomplete="off">
+            </label>
+
+            <label>
+              Marca
+              <input type="text" name="marca" placeholder="Ej: Hyundai" maxlength="100" autocomplete="off">
+            </label>
+
+            <label>
+              Modelo
+              <input type="text" name="modelo" placeholder="Ej: H-1" maxlength="100" autocomplete="off">
+            </label>
+
+            <label>
+              Año
+              <input type="number" name="anio" placeholder="Ej: 2024" min="1990" max="2035" inputmode="numeric">
+            </label>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit"><i data-lucide="plus"></i> Agregar vehiculo</button>
+          </div>
+        </form>
+      </article>
+
+      <aside class="app-card fleet-help-card">
+        <span class="icon-pill"><i data-lucide="truck"></i></span>
+        <h2>Dato para la demo</h2>
+        <p>Despues de agregar un vehiculo, puedes asignarlo a un chofer desde el modulo Choferes y luego usarlo en la asignacion de entregas por comuna.</p>
+      </aside>
+    </section>
+
+    <section>
+      <div class="section-heading">
+        <p class="section-label">Inventario</p>
+        <h2>Vehiculos registrados</h2>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Patente</th>
+              <th>Marca</th>
+              <th>Modelo</th>
+              <th>Año</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (!vehiculos || vehiculos.length === 0) { %>
+              <tr>
+                <td colspan="5">No hay vehiculos registrados.</td>
+              </tr>
+            <% } else { %>
+              <% vehiculos.forEach(v => { %>
+                <tr>
+                  <td><strong><%= v.patente %></strong></td>
+                  <td><%= v.marca || '-' %></td>
+                  <td><%= v.modelo || '-' %></td>
+                  <td><%= v.anio || '-' %></td>
+                  <td>
+                    <div class="row-actions">
+                      <a href="/flota/editar/<%= v.id %>" class="btn btn-secondary"><i data-lucide="pencil"></i> Editar</a>
+                      <form action="/flota/eliminar/<%= v.id %>" method="POST" class="inline-form" onsubmit="return confirm('¿Eliminar este vehiculo?')">
+                        <button type="submit" class="btn-danger"><i data-lucide="trash-2"></i> Eliminar</button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+              <% }) %>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <%- include('partials/footer') %>
 </body>
 </html>

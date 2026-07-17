@@ -1,0 +1,77 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<%- include('partials/head', { title: "Reportes | MasAgua" }) %>
+<body>
+  <%- include('partials/header') %>
+  <% const moneda = valor => new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(Number(valor) || 0); %>
+  <% const stats = metricas || {}; %>
+
+  <main class="page-shell">
+    <section class="admin-hero">
+      <div>
+        <p class="section-label">Reportes</p>
+        <h1>Indicadores de gestion</h1>
+        <p class="muted">Estados, ingresos estimados, productos vendidos y actividad relevante para la operacion.</p>
+      </div>
+      <a href="/admin" class="btn btn-secondary"><i data-lucide="arrow-left"></i> Volver al panel</a>
+    </section>
+
+    <section class="metric-grid admin-metrics">
+      <article class="metric"><span class="icon-pill"><i data-lucide="receipt"></i></span><strong><%= moneda(stats.ingresos_pedidos_vigentes) %></strong><span>Ingresos pedidos vigentes</span></article>
+      <article class="metric"><span class="icon-pill"><i data-lucide="badge-check"></i></span><strong><%= moneda(stats.ingresos_planes_confirmados) %></strong><span>Planes confirmados</span></article>
+      <article class="metric"><span class="icon-pill"><i data-lucide="package-clock"></i></span><strong><%= stats.pedidos_pendientes || 0 %></strong><span>Pedidos pendientes</span></article>
+      <article class="metric"><span class="icon-pill"><i data-lucide="truck"></i></span><strong><%= stats.entregas_total || 0 %></strong><span>Entregas creadas</span></article>
+    </section>
+
+    <section class="admin-tables">
+      <article>
+        <div class="section-heading"><p class="section-label">Pedidos</p><h2>Estados de pedidos</h2></div>
+        <div class="table-wrap"><table><thead><tr><th>Estado</th><th>Total</th></tr></thead><tbody>
+          <% pedidosPorEstado.forEach(row => { %><tr><td><span class="badge"><%= row.estado %></span></td><td><%= row.total %></td></tr><% }) %>
+        </tbody></table></div>
+      </article>
+
+      <article>
+        <div class="section-heading"><p class="section-label">Planes</p><h2>Estados de planes</h2></div>
+        <div class="table-wrap"><table><thead><tr><th>Estado</th><th>Total</th></tr></thead><tbody>
+          <% planesPorEstado.forEach(row => { %><tr><td><span class="badge"><%= row.estado %></span></td><td><%= row.total %></td></tr><% }) %>
+        </tbody></table></div>
+      </article>
+    </section>
+
+    <section class="admin-tables">
+      <article>
+        <div class="section-heading"><p class="section-label">Ventas</p><h2>Productos mas vendidos</h2></div>
+        <div class="table-wrap"><table><thead><tr><th>Producto</th><th>Unidades</th><th>Ingresos</th></tr></thead><tbody>
+          <% topProductos.forEach(row => { %><tr><td><%= row.nombre %></td><td><%= row.unidades %></td><td><%= moneda(row.ingresos) %></td></tr><% }) %>
+        </tbody></table></div>
+      </article>
+
+      <article>
+        <div class="section-heading"><p class="section-label">Clientes</p><h2>Clientes por ingresos</h2></div>
+        <div class="table-wrap"><table><thead><tr><th>Cliente</th><th>Pedidos</th><th>Ingresos</th></tr></thead><tbody>
+          <% topClientes.forEach(row => { %><tr><td><%= row.nombre || row.email %><br><small><%= row.email %></small></td><td><%= row.pedidos %></td><td><%= moneda(row.ingresos) %></td></tr><% }) %>
+        </tbody></table></div>
+      </article>
+    </section>
+
+    <section class="admin-tables">
+      <article>
+        <div class="section-heading"><p class="section-label">Ingresos</p><h2>Ingresos por mes</h2></div>
+        <div class="table-wrap"><table><thead><tr><th>Mes</th><th>Ingresos</th></tr></thead><tbody>
+          <% ingresosMensuales.forEach(row => { %><tr><td><%= row.mes %></td><td><%= moneda(row.ingresos) %></td></tr><% }) %>
+        </tbody></table></div>
+      </article>
+
+      <article>
+        <div class="section-heading"><p class="section-label">Logistica</p><h2>Entregas por zona</h2></div>
+        <div class="table-wrap"><table><thead><tr><th>Zona</th><th>Entregas</th></tr></thead><tbody>
+          <% entregasPorZona.forEach(row => { %><tr><td><%= row.zona %></td><td><%= row.entregas %></td></tr><% }) %>
+        </tbody></table></div>
+      </article>
+    </section>
+  </main>
+
+  <%- include('partials/footer') %>
+</body>
+</html>

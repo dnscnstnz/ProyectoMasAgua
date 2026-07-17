@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express');
 const path = require('path');
 const session = require('express-session');
@@ -24,7 +26,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(session({
-  secret: 'miSecretoSuperSecreto123!',
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
 }));
@@ -35,16 +37,20 @@ app.use(async (req, res, next) => {
     try {
       const result = await pool.query('SELECT * FROM usuarios WHERE id = $1', [req.session.userId]);
       req.user = result.rows[0];
+      res.locals.user = req.user;
     } catch (error) {
       console.error('Error al cargar usuario:', error);
     }
+  }
+  if (!res.locals.user) {
+    res.locals.user = null;
   }
   next();
 });
 
 // --- Middleware para roles ---
 function isCliente(req, res, next) {
-  if (req.user && req.user.rol === 'cliente') return next();
+  if (req.user && req.user.rol === 'cliente' && req.user.tipo !== 'empresa') return next();
   return res.redirect('/login.html');
 }
 
@@ -58,15 +64,102 @@ function isEmpresa(req, res, next) {
   return res.redirect('/login.html');
 }
 
+function limpiarTexto(valor) {
+  return String(valor || '').trim().replace(/\s+/g, ' ');
+}
+
+function normalizarRut(rut) {
+  return limpiarTexto(rut).replace(/\./g, '').replace(/\s/g, '').toUpperCase();
+}
+
+function esRutValido(rut) {
+  const rutLimpio = normalizarRut(rut);
+  if (!/^\d{7,8}-[\dK]$/.test(rutLimpio)) return false;
+
+  const [numero, digitoVerificador] = rutLimpio.split('-');
+  let suma = 0;
+  let multiplicador = 2;
+
+  for (let i = numero.length - 1; i >= 0; i--) {
+    suma += Number(numero[i]) * multiplicador;
+    multiplicador = multiplicador === 7 ? 2 : multiplicador + 1;
+  }
+
+  const resto = 11 - (suma % 11);
+  const digitoCalculado = resto === 11 ? '0' : resto === 10 ? 'K' : String(resto);
+  return digitoCalculado === digitoVerificador;
+}
+
+function normalizarTelefono(telefono) {
+  const soloDigitos = limpiarTexto(telefono).replace(/\D/g, '');
+  if (soloDigitos.startsWith('56') && soloDigitos.length === 11) return `+${soloDigitos}`;
+  if (soloDigitos.startsWith('9') && soloDigitos.length === 9) return `+56${soloDigitos}`;
+  return limpiarTexto(telefono);
+}
+
+function validarRegistro(datos) {
+  const tipo = limpiarTexto(datos.tipo).toLowerCase();
+  const email = limpiarTexto(datos.email).toLowerCase();
+  const password = String(datos.password || '');
+  const nombre = limpiarTexto(datos.nombre);
+  const rut = normalizarRut(datos.rut);
+  const direccion = limpiarTexto(datos.direccion);
+  const telefono = normalizarTelefono(datos.telefono);
+  const errores = [];
+
+  if (!['natural', 'empresa'].includes(tipo)) {
+    errores.push('Selecciona un tipo de cliente valido.');
+  }
+
+  if (!/^[\p{L}\p{N} .,'&-]{3,80}$/u.test(nombre)) {
+    errores.push('El nombre o razon social debe tener entre 3 y 80 caracteres y no incluir simbolos especiales.');
+  }
+
+  if (!esRutValido(rut)) {
+    errores.push('Ingresa un RUT valido con digito verificador. Ejemplo: 12.345.678-5.');
+  }
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) || email.length > 120) {
+    errores.push('Ingresa un correo electronico valido.');
+  }
+
+  if (!/^\+569\d{8}$/.test(telefono)) {
+    errores.push('Ingresa un telefono celular chileno valido. Ejemplo: +56 9 1234 5678.');
+  }
+
+  if (direccion.length < 6 || direccion.length > 120) {
+    errores.push('La direccion debe tener entre 6 y 120 caracteres.');
+  }
+
+  if (password.length < 8 || password.length > 72) {
+    errores.push('La contrasena debe tener entre 8 y 72 caracteres.');
+  }
+
+  if (!/[a-z]/.test(password) || !/[A-Z]/.test(password) || !/\d/.test(password)) {
+    errores.push('La contrasena debe incluir al menos una mayuscula, una minuscula y un numero.');
+  }
+
+  return {
+    datosLimpios: { tipo, email, password, nombre, rut, direccion, telefono },
+    errores
+  };
+}
+
 // --- Rutas de autenticación ---
 app.get('/register', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'register.html'));
 });
 
 app.post('/register', async (req, res) => {
-  const { email, password, tipo, nombre, rut, direccion, telefono } = req.body;
+  const { datosLimpios, errores } = validarRegistro(req.body);
+  const { email, password, tipo, nombre, rut, direccion, telefono } = datosLimpios;
+
+  if (errores.length > 0) {
+    return res.status(400).send(`Datos invalidos:<br><ul>${errores.map(error => `<li>${error}</li>`).join('')}</ul><a href="/register">Volver al registro</a>`);
+  }
+
   try {
-    const existe = await pool.query('SELECT * FROM usuarios WHERE email = $1', [email]);
+    const existe = await pool.query('SELECT * FROM usuarios WHERE email = $1 OR rut = $2', [email, rut]);
     if (existe.rows.length > 0) return res.send('Usuario ya existe.');
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -122,76 +215,6 @@ app.post('/logout', (req, res) => {
   req.session.destroy(() => {
     res.redirect('/login.html');
   });
-});
-
-// --- Rutas para cliente ---
-app.get('/cliente/pedido', isCliente, async (req, res) => {
-  try {
-    const productos = await pool.query('SELECT * FROM productos');
-    const pedidos = await pool.query(
-      `SELECT p.id, p.estado, p.fecha,
-       json_agg(json_build_object('nombre', pr.nombre, 'cantidad', dp.cantidad)) as productos
-       FROM pedidos p
-       JOIN detalle_pedido dp ON dp.pedido_id = p.id
-       JOIN productos pr ON pr.id = dp.producto_id
-       WHERE p.usuario_id = $1
-       GROUP BY p.id
-       ORDER BY p.fecha DESC`,
-      [req.user.id]
-    );
-    res.render('pedido', {
-      user: req.user,
-      productos: productos.rows,
-      pedidos: pedidos.rows
-    });
-  } catch (error) {
-    console.error('Error cargando productos y pedidos:', error);
-    res.send('Error cargando información para hacer pedido');
-  }
-});
-
-app.post('/cliente/pedido', isCliente, async (req, res) => {
-  try {
-    const result = await pool.query(
-      'INSERT INTO pedidos (usuario_id, estado) VALUES ($1, $2) RETURNING id',
-      [req.user.id, 'pendiente']
-    );
-    const pedidoId = result.rows[0].id;
-    const productos = await pool.query('SELECT id FROM productos');
-    for (const producto of productos.rows) {
-      const cantidad = parseInt(req.body[`cantidad_${producto.id}`]) || 0;
-      if (cantidad > 0) {
-        await pool.query(
-          'INSERT INTO detalle_pedido (pedido_id, producto_id, cantidad) VALUES ($1, $2, $3)',
-          [pedidoId, producto.id, cantidad]
-        );
-      }
-    }
-    res.redirect('/cliente/mis-pedidos');
-  } catch (error) {
-    console.error('Error al guardar pedido:', error);
-    res.send('Error al guardar pedido');
-  }
-});
-
-// --- Rutas para admin ---
-app.get('/admin/pedidos', isAdmin, async (req, res) => {
-  try {
-    const pedidos = await pool.query(
-      `SELECT p.id, p.estado, p.fecha, u.nombre as cliente,
-       json_agg(json_build_object('nombre', pr.nombre, 'cantidad', dp.cantidad)) as productos
-       FROM pedidos p
-       JOIN usuarios u ON u.id = p.usuario_id
-       JOIN detalle_pedido dp ON dp.pedido_id = p.id
-       JOIN productos pr ON pr.id = dp.producto_id
-       GROUP BY p.id, u.nombre
-       ORDER BY p.fecha DESC`
-    );
-    res.render('admin-pedidos', { pedidos: pedidos.rows });
-  } catch (error) {
-    console.error('Error cargando pedidos admin:', error);
-    res.send('Error cargando pedidos admin');
-  }
 });
 
 // --- Rutas importadas de módulos ---

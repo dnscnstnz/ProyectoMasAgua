@@ -1,18 +1,58 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Editar Vehículo</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="p-4">
-  <h1 class="text-2xl font-bold mb-4">Editar Vehículo</h1>
+﻿<!DOCTYPE html>
+<html lang="es">
+<%- include('partials/head', { title: "Editar Vehiculo | MasAgua" }) %>
+<body>
+  <%- include('partials/header') %>
 
-  <form action="/flota/editar/<%= vehiculo.id %>" method="POST" class="space-y-2">
-    <input type="text" name="patente" value="<%= vehiculo.patente %>" required class="border p-1 block w-full">
-    <input type="text" name="marca" value="<%= vehiculo.marca %>" class="border p-1 block w-full">
-    <input type="text" name="modelo" value="<%= vehiculo.modelo %>" class="border p-1 block w-full">
-    <input type="number" name="anio" value="<%= vehiculo.anio %>" class="border p-1 block w-full">
-    <button type="submit" class="bg-green-500 text-white px-4 py-2">Guardar Cambios</button>
-  </form>
+  <main class="page-shell">
+    <section class="admin-hero">
+      <div>
+        <p class="section-label">Flota</p>
+        <h1>Editar vehiculo</h1>
+        <p class="muted">Actualiza los datos operativos del vehiculo seleccionado.</p>
+      </div>
+      <a href="/flota" class="btn btn-secondary"><i data-lucide="arrow-left"></i> Volver a flota</a>
+    </section>
+
+    <section class="fleet-edit-shell">
+      <article class="app-card fleet-form-card">
+        <div class="section-heading">
+          <p class="section-label">Patente <%= vehiculo.patente %></p>
+          <h2>Datos del vehiculo</h2>
+        </div>
+
+        <form action="/flota/editar/<%= vehiculo.id %>" method="POST" class="fleet-form">
+          <div class="form-grid">
+            <label>
+              Patente
+              <input type="text" name="patente" value="<%= vehiculo.patente %>" maxlength="20" required autocomplete="off">
+            </label>
+
+            <label>
+              Marca
+              <input type="text" name="marca" value="<%= vehiculo.marca || '' %>" maxlength="100" autocomplete="off">
+            </label>
+
+            <label>
+              Modelo
+              <input type="text" name="modelo" value="<%= vehiculo.modelo || '' %>" maxlength="100" autocomplete="off">
+            </label>
+
+            <label>
+              Año
+              <input type="number" name="anio" value="<%= vehiculo.anio || '' %>" min="1990" max="2035" inputmode="numeric">
+            </label>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit"><i data-lucide="save"></i> Guardar cambios</button>
+            <a href="/flota" class="btn btn-secondary">Cancelar</a>
+          </div>
+        </form>
+      </article>
+    </section>
+  </main>
+
+  <%- include('partials/footer') %>
 </body>
 </html>

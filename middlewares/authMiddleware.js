@@ -14,7 +14,7 @@ function isEmpresa(req, res, next) {
 }
 
 function isCliente(req, res, next) {
-  if (req.user && req.user.rol === 'cliente') return next();
+  if (req.user && req.user.rol === 'cliente' && req.user.tipo !== 'empresa') return next();
   res.status(403).send('Acceso denegado - solo clientes');
 }
 

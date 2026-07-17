@@ -3,7 +3,12 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "fix:products": "node scripts/fixProductPrices.js",
+    "fix:drivers": "node scripts/fixDriverCoverage.js",
+    "fix:communes": "node scripts/fixCommuneDuplicates.js",
+    "fix:zones": "node scripts/fixOperationalZones.js"
   },
   "keywords": [],
   "author": "",
@@ -11,6 +16,7 @@
   "description": "",
   "dependencies": {
     "bcrypt": "^6.0.0",
+    "dotenv": "^17.4.2",
     "ejs": "^3.1.10",
     "express": "^5.1.0",
     "express-session": "^1.18.1",

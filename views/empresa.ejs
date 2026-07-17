@@ -1,40 +1,10 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Panel Empresa - MasAgua</title>
+<%- include('partials/head', { title: "Panel Empresa - MasAgua" }) %>
+<body>
+  <%- include('partials/header') %>
 
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Manrope', 'sans-serif'],
-          },
-          colors: {
-            primary: '#00796b',
-            primaryLight: '#48a999',
-          }
-        }
-      }
-    }
-  </script>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&display=swap" rel="stylesheet" />
-</head>
-<body class="bg-[#f4f6f8] font-sans text-[#1f2937] min-h-screen flex flex-col">
-
-  <header class="bg-primary text-white shadow-md">
-    <div class="container mx-auto flex items-center justify-between p-4">
-      <h1 class="text-xl font-bold">MasAgua - Panel Empresa</h1>
-      <form method="POST" action="/logout">
-        <button type="submit" class="bg-white text-primary font-semibold px-4 py-2 rounded-full hover:bg-primaryLight hover:text-white transition">
-          Cerrar sesión
-        </button>
-      </form>
-    </div>
-  </header>
+  
 
   <main class="container mx-auto flex-grow px-4 py-10">
 
@@ -76,9 +46,8 @@
     </div>
   </main>
 
-  <footer class="bg-primary text-white text-center py-6 mt-auto shadow-inner">
-    <p class="text-sm opacity-80">&copy; 2025 MasAgua Spa. Todos los derechos reservados.</p>
-  </footer>
+  
 
+  <%- include('partials/footer') %>
 </body>
 </html>

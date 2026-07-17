@@ -10,34 +10,42 @@
       theme: {
         extend: {
           fontFamily: {
-            sans: ['Manrope', 'sans-serif'],
+            sans: ['Inter', 'sans-serif'],
           },
         }
       }
     }
   </script>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
   <style>
     body {
-      font-family: 'Manrope', sans-serif;
-      background-color: #f4f6f8;
-      color: #1f2937;
+      font-family: 'Inter', sans-serif;
+      background-color: #F0F8FF;
+      color: #16324A;
     }
   </style>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/saas.css">
+  <script src="https://unpkg.com/lucide@latest" defer></script>
+  <script defer>document.addEventListener('DOMContentLoaded', function () { if (window.lucide) window.lucide.createIcons(); });</script>
 </head>
 <body>
-  <header class="bg-[#1e293b] text-white shadow-md">
+  <header class="bg-[#16324A] text-white shadow-md">
     <div class="container mx-auto p-4 flex items-center justify-between">
       <h1 class="text-2xl font-bold">MasAgua</h1>
       <nav>
-        <a href="index.html" class="hover:text-[#7dd3fc] uppercase font-semibold text-sm">Volver al inicio</a>
+        <a href="index.html" class="hover:text-[#B8DCFF] uppercase font-semibold text-sm">Volver al inicio</a>
       </nav>
     </div>
   </header>
 
   <main class="flex justify-center items-center min-h-[80vh]">
-    <form action="/register" method="POST" class="bg-white p-2 rounded shadow w-full max-w-xs space-y-2 text-sm">
+    <form action="/register" method="POST" id="registerForm" class="bg-white p-2 rounded shadow w-full max-w-xs space-y-2 text-sm">
       <h2 class="text-2xl font-semibold mb-4 text-center">Crear Cuenta</h2>
+      <div id="formErrors" class="field-error hidden" aria-live="polite"></div>
 
       <!-- Tipo de usuario -->
       <label for="tipo" class="block mb-2 font-semibold">Tipo de cliente</label>
@@ -49,39 +57,112 @@
 
       <!-- Nombre completo / empresa -->
       <label for="nombre" class="block mb-2 font-semibold">Nombre Completo o Razón Social</label>
-      <input type="text" id="nombre" name="nombre" required placeholder="Ej: Juan Pérez o Agua Limpia SpA" class="w-full mb-4 px-4 py-2 border rounded" />
+      <input type="text" id="nombre" name="nombre" required minlength="3" maxlength="80" autocomplete="name" title="Usa entre 3 y 80 caracteres. Solo letras, números, espacios y . , ' & -" placeholder="Ej: Juan Pérez o Agua Limpia SpA" class="w-full mb-2 px-4 py-2 border rounded" />
+      <p class="text-xs mb-4">Entre 3 y 80 caracteres. Para empresas se permite razón social.</p>
 
       <!-- Rut o RUT empresa -->
       <label for="rut" class="block mb-2 font-semibold">RUT</label>
-      <input type="text" id="rut" name="rut" required placeholder="12.345.678-9" class="w-full mb-4 px-4 py-2 border rounded" />
+      <input type="text" id="rut" name="rut" required maxlength="12" autocomplete="off" pattern="\d{1,2}\.?\d{3}\.?\d{3}-[\dkK]" title="Ingresa un RUT válido con dígito verificador. Ej: 12.345.678-5" placeholder="12.345.678-5" class="w-full mb-2 px-4 py-2 border rounded" />
+      <p class="text-xs mb-4">Debe incluir guion y dígito verificador.</p>
 
       <!-- Dirección -->
       <label for="direccion" class="block mb-2 font-semibold">Dirección</label>
-      <input type="text" id="direccion" name="direccion" required placeholder="Calle 123, Comuna, Región" class="w-full mb-4 px-4 py-2 border rounded" />
+      <input type="text" id="direccion" name="direccion" required minlength="6" maxlength="120" autocomplete="street-address" placeholder="Calle 123, Comuna, Región" class="w-full mb-4 px-4 py-2 border rounded" />
 
       <!-- Teléfono -->
       <label for="telefono" class="block mb-2 font-semibold">Teléfono</label>
-      <input type="tel" id="telefono" name="telefono" required placeholder="+56 9 1234 5678" class="w-full mb-4 px-4 py-2 border rounded" />
+      <input type="tel" id="telefono" name="telefono" required inputmode="tel" autocomplete="tel" pattern="(\+?56\s?)?9\s?\d{4}\s?\d{4}" title="Ingresa un celular chileno. Ej: +56 9 1234 5678" placeholder="+56 9 1234 5678" class="w-full mb-2 px-4 py-2 border rounded" />
+      <p class="text-xs mb-4">Solo celulares chilenos, por ejemplo +56 9 1234 5678.</p>
 
       <!-- Email -->
       <label for="email" class="block mb-2 font-semibold">Correo electrónico</label>
-      <input type="email" id="email" name="email" required placeholder="correo@ejemplo.com" class="w-full mb-4 px-4 py-2 border rounded" />
+      <input type="email" id="email" name="email" required maxlength="120" autocomplete="email" placeholder="correo@ejemplo.com" class="w-full mb-4 px-4 py-2 border rounded" />
 
       <!-- Contraseña -->
       <label for="password" class="block mb-2 font-semibold">Contraseña</label>
-      <input type="password" id="password" name="password" required placeholder="********" class="w-full mb-6 px-4 py-2 border rounded" />
+      <input type="password" id="password" name="password" required minlength="8" maxlength="72" autocomplete="new-password" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,72}" title="Debe tener entre 8 y 72 caracteres, una mayúscula, una minúscula y un número." placeholder="********" class="w-full mb-2 px-4 py-2 border rounded" />
+      <p class="text-xs mb-6">Mínimo 8 caracteres, con mayúscula, minúscula y número.</p>
 
       <!-- Botón -->
-      <button type="submit" class="mt-2 w-full bg-[#7dd3fc] text-[#1e293b] font-semibold py-2 rounded hover:bg-[#38bdf8] transition">
+      <button type="submit" class="mt-2 w-full bg-[#B8DCFF] text-[#16324A] font-semibold py-2 rounded hover:bg-[#4A9ECC] transition">
         Crear cuenta
       </button>
 
       <!-- Link a login -->
       <p class="mt-4 text-center text-sm">
         ¿Ya tienes una cuenta?
-        <a href="login.html" class="text-[#7dd3fc] hover:underline font-semibold">Inicia sesión aquí</a>
+        <a href="login.html" class="text-[#B8DCFF] hover:underline font-semibold">Inicia sesión aquí</a>
       </p>
     </form>
   </main>
+  <script>
+    const form = document.getElementById('registerForm');
+    const errorBox = document.getElementById('formErrors');
+
+    function limpiarTexto(valor) {
+      return String(valor || '').trim().replace(/\s+/g, ' ');
+    }
+
+    function normalizarRut(rut) {
+      return limpiarTexto(rut).replace(/\./g, '').replace(/\s/g, '').toUpperCase();
+    }
+
+    function validarRut(rut) {
+      const rutLimpio = normalizarRut(rut);
+      if (!/^\d{7,8}-[\dK]$/.test(rutLimpio)) return false;
+
+      const [numero, digitoVerificador] = rutLimpio.split('-');
+      let suma = 0;
+      let multiplicador = 2;
+
+      for (let i = numero.length - 1; i >= 0; i--) {
+        suma += Number(numero[i]) * multiplicador;
+        multiplicador = multiplicador === 7 ? 2 : multiplicador + 1;
+      }
+
+      const resto = 11 - (suma % 11);
+      const digitoCalculado = resto === 11 ? '0' : resto === 10 ? 'K' : String(resto);
+      return digitoCalculado === digitoVerificador;
+    }
+
+    function normalizarTelefono(telefono) {
+      const soloDigitos = limpiarTexto(telefono).replace(/\D/g, '');
+      if (soloDigitos.startsWith('56') && soloDigitos.length === 11) return `+${soloDigitos}`;
+      if (soloDigitos.startsWith('9') && soloDigitos.length === 9) return `+56${soloDigitos}`;
+      return limpiarTexto(telefono);
+    }
+
+    form.addEventListener('submit', (event) => {
+      const errores = [];
+      const tipo = limpiarTexto(form.tipo.value).toLowerCase();
+      const nombre = limpiarTexto(form.nombre.value);
+      const rut = normalizarRut(form.rut.value);
+      const direccion = limpiarTexto(form.direccion.value);
+      const telefono = normalizarTelefono(form.telefono.value);
+      const email = limpiarTexto(form.email.value).toLowerCase();
+      const password = form.password.value;
+
+      form.tipo.value = tipo;
+      form.nombre.value = nombre;
+      form.rut.value = rut;
+      form.direccion.value = direccion;
+      form.telefono.value = telefono;
+      form.email.value = email;
+
+      if (!['natural', 'empresa'].includes(tipo)) errores.push('Selecciona un tipo de cliente.');
+      if (!/^[\p{L}\p{N} .,'&-]{3,80}$/u.test(nombre)) errores.push('Revisa el nombre o razón social.');
+      if (!validarRut(rut)) errores.push('El RUT no es válido.');
+      if (direccion.length < 6 || direccion.length > 120) errores.push('La dirección debe tener entre 6 y 120 caracteres.');
+      if (!/^\+569\d{8}$/.test(telefono)) errores.push('El teléfono debe ser un celular chileno válido.');
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) errores.push('El correo electrónico no tiene un formato válido.');
+      if (!/[a-z]/.test(password) || !/[A-Z]/.test(password) || !/\d/.test(password) || password.length < 8) errores.push('La contraseña debe tener mayúscula, minúscula, número y al menos 8 caracteres.');
+
+      if (errores.length > 0) {
+        event.preventDefault();
+        errorBox.classList.remove('hidden');
+        errorBox.innerHTML = `<strong>Revisa estos campos:</strong><ul>${errores.map(error => `<li>${error}</li>`).join('')}</ul>`;
+      }
+    });
+  </script>
 </body>
 </html>

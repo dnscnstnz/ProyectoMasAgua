@@ -1,60 +1,86 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <title>Agregar Nuevo Chofer</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-50 p-6">
-  <div class="max-w-md mx-auto bg-white p-6 rounded shadow">
-    <h1 class="text-2xl font-bold mb-4">Agregar Nuevo Chofer</h1>
+<%- include('partials/head', { title: "Nuevo Chofer | MasAgua" }) %>
+<body>
+  <%- include('partials/header') %>
 
-    <form action="/choferes/nuevo" method="POST" class="space-y-4">
-      <label class="block">
-        <span class="text-gray-700">Nombre completo</span>
-        <input type="text" name="nombre" required class="mt-1 block w-full rounded border-gray-300 shadow-sm" />
-      </label>
+  <main class="page-shell">
+    <section class="admin-hero">
+      <div>
+        <p class="section-label">Logistica</p>
+        <h1>Agregar chofer</h1>
+        <p class="muted">Define una zona base y selecciona solo comunas dentro de esa zona.</p>
+      </div>
+      <a href="/choferes" class="btn btn-secondary"><i data-lucide="arrow-left"></i> Volver</a>
+    </section>
 
-      <label class="block">
-        <span class="text-gray-700">RUT</span>
-        <input type="text" name="rut" required class="mt-1 block w-full rounded border-gray-300 shadow-sm" />
-      </label>
+    <section class="driver-form-shell">
+      <article class="app-card fleet-form-card">
+        <form action="/choferes/nuevo" method="POST" class="fleet-form">
+          <div class="form-grid">
+            <label>Nombre completo<input type="text" name="nombre" required autocomplete="off"></label>
+            <label>RUT<input type="text" name="rut" required autocomplete="off"></label>
+            <label>Telefono<input type="text" name="telefono" autocomplete="off"></label>
+            <label>Direccion<input type="text" name="direccion" autocomplete="off"></label>
+            <label>Estado<input type="text" name="estado" value="activo" autocomplete="off"></label>
+            <label>Vehiculo
+              <select name="vehiculo_id">
+                <option value="">Sin vehiculo asignado</option>
+                <% vehiculos.forEach(v => { %>
+                  <option value="<%= v.id %>"><%= v.patente %> - <%= v.marca || '' %> <%= v.modelo || '' %></option>
+                <% }) %>
+              </select>
+            </label>
+            <label>Zona base
+              <select name="zona_id" required data-zone-select>
+                <option value="">Selecciona una zona</option>
+                <% zonas.forEach(z => { %>
+                  <option value="<%= z.id %>"><%= z.nombre %></option>
+                <% }) %>
+              </select>
+            </label>
+            <label>Comunas de cobertura
+              <select name="comunas" multiple required size="9" data-commune-select>
+                <% zonas.forEach(z => { %>
+                  <% z.comunas.forEach(c => { %>
+                    <option value="<%= c.id %>" data-zona="<%= z.id %>"><%= c.nombre %></option>
+                  <% }) %>
+                <% }) %>
+              </select>
+            </label>
+          </div>
 
-      <label class="block">
-        <span class="text-gray-700">Teléfono</span>
-        <input type="text" name="telefono" class="mt-1 block w-full rounded border-gray-300 shadow-sm" />
-      </label>
+          <p class="muted form-note">Las comunas disponibles cambian segun la zona base. Esto evita rutas ilogicas entre sectores lejanos.</p>
 
-      <label class="block">
-        <span class="text-gray-700">Dirección</span>
-        <input type="text" name="direccion" class="mt-1 block w-full rounded border-gray-300 shadow-sm" />
-      </label>
+          <div class="form-actions">
+            <button type="submit"><i data-lucide="save"></i> Guardar chofer</button>
+            <a href="/choferes" class="btn btn-secondary">Cancelar</a>
+          </div>
+        </form>
+      </article>
+    </section>
+  </main>
 
-      <label class="block">
-        <span class="text-gray-700">Comunas Asignadas</span>
-        <select name="comunas[]" multiple required size="5"
-                class="mt-1 block w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-          <% comunas.forEach(c => { %>
-            <option value="<%= c.id %>"><%= c.nombre %></option>
-          <% }) %>
-        </select>
-        <p class="text-sm text-gray-500 mt-1">Selecciona una o más comunas (Ctrl/Cmd + clic).</p>
-      </label>
+  <%- include('partials/footer') %>
+  <script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const zonaSelect = document.querySelector('[data-zone-select]');
+    const comunaSelect = document.querySelector('[data-commune-select]');
+    if (!zonaSelect || !comunaSelect) return;
 
-      <label class="block">
-        <span class="text-gray-700">Estado</span>
-        <input type="text" name="estado" class="mt-1 block w-full rounded border-gray-300 shadow-sm" />
-      </label>
+    function syncComunas() {
+      const zonaId = zonaSelect.value;
+      Array.from(comunaSelect.options).forEach(option => {
+        const visible = option.dataset.zona === zonaId;
+        option.hidden = !visible;
+        option.disabled = !visible;
+        if (!visible) option.selected = false;
+      });
+    }
 
-      <label class="block">
-        <span class="text-gray-700">Vehículo ID</span>
-        <input type="number" name="vehiculo_id" class="mt-1 block w-full rounded border-gray-300 shadow-sm" />
-      </label>
-
-      <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700 transition">Guardar</button>
-    </form>
-
-    <a href="/choferes" class="inline-block mt-4 text-indigo-600 hover:underline">Volver</a>
-  </div>
+    zonaSelect.addEventListener('change', syncComunas);
+    syncComunas();
+  });
+</script>
 </body>
 </html>

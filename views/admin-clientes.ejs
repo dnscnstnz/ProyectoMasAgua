@@ -1,0 +1,64 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<%- include('partials/head', { title: "Clientes | MasAgua" }) %>
+<body>
+  <%- include('partials/header') %>
+  <% const moneda = valor => new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(Number(valor) || 0); %>
+
+  <main class="page-shell">
+    <section class="admin-hero">
+      <div>
+        <p class="section-label">Clientes</p>
+        <h1>Clientes registrados</h1>
+        <p class="muted">Listado de clientes naturales y empresas existentes en la base de datos.</p>
+      </div>
+      <a href="/admin" class="btn btn-secondary"><i data-lucide="arrow-left"></i> Volver al panel</a>
+    </section>
+
+    <section class="metric-grid admin-metrics">
+      <article class="metric"><span class="icon-pill"><i data-lucide="users"></i></span><strong><%= resumen.total || 0 %></strong><span>Total clientes</span></article>
+      <article class="metric"><span class="icon-pill"><i data-lucide="user-round"></i></span><strong><%= resumen.naturales || 0 %></strong><span>Naturales</span></article>
+      <article class="metric"><span class="icon-pill"><i data-lucide="building-2"></i></span><strong><%= resumen.empresas || 0 %></strong><span>Empresas</span></article>
+    </section>
+
+    <section>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Cliente</th>
+              <th>Tipo</th>
+              <th>Contacto</th>
+              <th>Direccion</th>
+              <th>Pedidos</th>
+              <th>Planes</th>
+              <th>Total estimado</th>
+              <th>Ultima actividad</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (!clientes || clientes.length === 0) { %>
+              <tr><td colspan="8">No hay clientes registrados.</td></tr>
+            <% } else { %>
+              <% clientes.forEach(cliente => { %>
+                <tr>
+                  <td><strong><%= cliente.nombre || '-' %></strong><br><small><%= cliente.rut || '-' %></small></td>
+                  <td><span class="badge"><%= cliente.tipo === 'empresa' ? 'Empresa' : 'Natural' %></span></td>
+                  <td><%= cliente.email %><br><small><%= cliente.telefono || '-' %></small></td>
+                  <td><%= cliente.direccion || '-' %></td>
+                  <td><%= cliente.pedidos %></td>
+                  <td><%= cliente.planes %></td>
+                  <td><%= moneda(Number(cliente.total_pedidos || 0) + Number(cliente.total_planes || 0)) %></td>
+                  <td><%= cliente.ultima_actividad ? new Date(cliente.ultima_actividad).toLocaleDateString('es-CL') : '-' %></td>
+                </tr>
+              <% }) %>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <%- include('partials/footer') %>
+</body>
+</html>

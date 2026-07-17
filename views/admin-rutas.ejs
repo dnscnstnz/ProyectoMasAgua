@@ -1,126 +1,143 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Admin Rutas | MasAgua</title>
+<%- include('partials/head', { title: "Entregas | MasAgua" }) %>
 
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Manrope', 'sans-serif'],
-          },
-          colors: {
-            primary: '#00796b',
-            primaryLight: '#48a999',
-          }
-        }
-      }
-    }
-  </script>
-</head>
+<body>
+  <%- include('partials/header') %>
 
-<body class="bg-gray-50 font-sans p-8">
-  <section class="max-w-5xl mx-auto bg-white rounded-lg shadow-lg p-8 mb-12">
-    <h2 class="text-3xl font-bold mb-6 text-primary">Crear Nueva Ruta</h2>
+  <main class="container mx-auto px-4 py-10">
+    <div class="mb-6">
+      <a href="/admin" class="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 shadow-md transition">
+        <i data-lucide="arrow-left"></i> Volver al panel de administracion
+      </a>
+    </div>
 
-    <form action="/admin/rutas" method="POST" class="space-y-6">
-      <div class="grid grid-cols-3 gap-4">
-        <div>
-          <label for="id_chofer" class="block mb-2 font-semibold text-gray-700">Chofer (Cobertura Comunas)</label>
-          <select id="id_chofer" name="id_chofer" required
-            class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
-            <% choferes.forEach(c => { %>
-              <option value="<%= c.id %>"><%= c.nombre %> (<%= c.comunas_asignadas || 'Sin comunas asignadas' %>)</option>
-            <% }) %>
-          </select>
+    <section class="max-w-7xl mx-auto bg-white rounded-lg shadow-lg p-8 mb-12">
+      <h1 class="text-3xl font-bold mb-2 text-primary">Asignacion de entregas</h1>
+      <p class="text-gray-600 mb-8">
+        Pedidos pendientes agrupados por la comuna de entrega seleccionada por el cliente.
+      </p>
+
+      <% if (!pedidosPorComuna.length) { %>
+        <p class="text-center text-gray-600 py-8">No hay pedidos pendientes para asignar.</p>
+      <% } else { %>
+        <div class="space-y-8">
+          <% pedidosPorComuna.forEach(grupo => { %>
+            <div class="bg-white rounded-2xl border border-blue-100 p-6 shadow-sm">
+              <h2 class="text-xl font-semibold text-primary mb-4">
+                <i data-lucide="map-pin"></i> <%= grupo.comuna %>
+              </h2>
+
+              <div class="overflow-x-auto">
+                <table class="min-w-full">
+                  <thead>
+                    <tr>
+                      <th>Pedido</th>
+                      <th>Cliente</th>
+                      <th>Direccion</th>
+                      <th>Productos</th>
+                      <th>Asignacion</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% grupo.pedidos.forEach(pedido => { %>
+                      <tr>
+                        <td>#<%= pedido.pedido_id %></td>
+                        <td>
+                          <strong><%= pedido.cliente_nombre %></strong><br>
+                          <small><%= pedido.telefono || '-' %></small>
+                        </td>
+                        <td><%= pedido.direccion_entrega || '-' %></td>
+                        <td>
+                          <ul>
+                            <% pedido.productos.forEach(producto => { %>
+                              <li><%= producto.nombre %> (x<%= producto.cantidad %>)</li>
+                            <% }) %>
+                          </ul>
+                        </td>
+                        <td>
+                          <% if (!pedido.choferes_disponibles.length) { %>
+                            <span class="badge">Sin chofer compatible</span>
+                          <% } else { %>
+                            <form action="/admin/rutas" method="POST" class="space-y-3">
+                              <input type="hidden" name="pedido_id" value="<%= pedido.pedido_id %>">
+                              <select name="chofer_id" required>
+                                <option value="">Seleccionar</option>
+                                <% pedido.choferes_disponibles.forEach(chofer => { %>
+                                  <option value="<%= chofer.id %>">
+                                    <%= chofer.nombre %><%= chofer.zona ? ` - ${chofer.zona}` : '' %><%= chofer.telefono ? ` (${chofer.telefono})` : '' %>
+                                  </option>
+                                <% }) %>
+                              </select>
+                              <input type="datetime-local" name="fecha_programada" required>
+                              <button type="submit">Asignar</button>
+                            </form>
+                          <% } %>
+                        </td>
+                      </tr>
+                    <% }) %>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          <% }) %>
         </div>
+      <% } %>
+    </section>
 
-        <div>
-          <label for="id_vehiculo" class="block mb-2 font-semibold text-gray-700">Vehículo</label>
-          <select id="id_vehiculo" name="id_vehiculo" required
-            class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
-            <% vehiculos.forEach(v => { %>
-              <option value="<%= v.id %>"><%= v.patente %></option>
-            <% }) %>
-          </select>
-        </div>
+    <section class="max-w-7xl mx-auto bg-white rounded-lg shadow p-6">
+      <h2 class="text-2xl font-semibold mb-4 text-primary">
+        <i data-lucide="truck"></i> Entregas asignadas
+      </h2>
 
-        <div>
-          <label for="fecha_programada" class="block mb-2 font-semibold text-gray-700">Fecha Programada</label>
-          <input type="date" id="fecha_programada" name="fecha_programada" required
-            class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
-        </div>
-      </div>
-
-      <div class="grid grid-cols-2 gap-4 mt-6">
-        <div>
-          <label for="direccion_inicio" class="block mb-2 font-semibold text-gray-700">Dirección Inicio</label>
-          <input type="text" id="direccion_inicio" name="direccion_inicio" placeholder="Ej: Calle Falsa 123" required
-            class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
-        </div>
-        <div>
-          <label for="direccion_fin" class="block mb-2 font-semibold text-gray-700">Dirección Fin</label>
-          <input type="text" id="direccion_fin" name="direccion_fin" placeholder="Ej: Avenida Siempre Viva 456" required
-            class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
-        </div>
-      </div>
-      <div>
-  <label for="comunas" class="block mb-2 font-semibold text-gray-700">Comunas a cubrir</label>
-  <select id="comunas" name="comunas" multiple required
-    class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary h-48">
-    <% comunas.forEach(c => { %>
-      <option value="<%= c.id %>"><%= c.nombre %></option>
-    <% }) %>
-  </select>
-  <p class="text-xs text-gray-500 mt-1">Mantén presionado Ctrl para seleccionar varias.</p>
-</div>
-
-
-      <button type="submit" class="w-full bg-primary text-white font-bold py-3 rounded hover:bg-primaryLight transition">
-        Guardar Ruta
-      </button>
-    </form>
-  </section>
-
-  <section class="max-w-7xl mx-auto bg-white rounded-lg shadow p-6">
-    <h3 class="text-2xl font-semibold mb-4 text-primary">Rutas Existentes</h3>
-
-    <% if (!rutas.length) { %>
-      <p class="text-center text-gray-600 py-8">No hay rutas registradas.</p>
-    <% } else { %>
-      <div class="overflow-x-auto">
-        <table class="min-w-full border-collapse border border-gray-300">
-          <thead class="bg-primaryLight">
-            <tr>
-              <th class="border border-gray-300 px-4 py-2 text-left">ID</th>
-              <th class="border border-gray-300 px-4 py-2 text-left">Chofer</th>
-              <th class="border border-gray-300 px-4 py-2 text-left">Cobertura Comunas</th>
-              <th class="border border-gray-300 px-4 py-2 text-left">Vehículo</th>
-              <th class="border border-gray-300 px-4 py-2 text-left">Dirección Inicio</th>
-              <th class="border border-gray-300 px-4 py-2 text-left">Dirección Fin</th>
-              <th class="border border-gray-300 px-4 py-2 text-left">Fecha</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% rutas.forEach(ruta => { %>
-              <tr class="even:bg-gray-50 hover:bg-primaryLight transition-colors">
-                <td class="border border-gray-300 px-4 py-2"><%= ruta.id %></td>
-                <td class="border border-gray-300 px-4 py-2"><%= ruta.chofer || '-' %></td>
-                <td class="border border-gray-300 px-4 py-2"><%= ruta.comunas_asignadas || '-' %></td>
-                <td class="border border-gray-300 px-4 py-2"><%= ruta.vehiculo || '-' %></td>
-                <td class="border border-gray-300 px-4 py-2"><%= ruta.direccion_inicio || '-' %></td>
-                <td class="border border-gray-300 px-4 py-2"><%= ruta.direccion_fin || '-' %></td>
-                <td class="border border-gray-300 px-4 py-2"><%= new Date(ruta.fecha_programada).toLocaleDateString('es-CL') %></td>
+      <% if (!entregas.length) { %>
+        <p class="text-center text-gray-600 py-8">No hay entregas asignadas.</p>
+      <% } else { %>
+        <div class="overflow-x-auto">
+          <table class="min-w-full">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Pedido</th>
+                <th>Cliente</th>
+                <th>Comuna</th>
+                <th>Chofer</th>
+                <th>Zona</th>
+                <th>Fecha programada</th>
+                <th>Estado</th>
+                <th>Productos</th>
               </tr>
-            <% }) %>
-          </tbody>
-        </table>
-      </div>
-    <% } %>
-  </section>
+            </thead>
+            <tbody>
+              <% entregas.forEach(entrega => { %>
+                <tr>
+                  <td>#<%= entrega.id %></td>
+                  <td>#<%= entrega.pedido_id %></td>
+                  <td><%= entrega.cliente_nombre %></td>
+                  <td><%= entrega.comuna_nombre || 'Sin comuna' %></td>
+                  <td><%= entrega.chofer_nombre %></td>
+                  <td><span class="badge"><%= entrega.chofer_zona_nombre || '-' %></span></td>
+                  <td>
+                    <%= entrega.fecha_programada ? new Date(entrega.fecha_programada).toLocaleString('es-CL') : '-' %>
+                  </td>
+                  <td><span class="badge"><%= entrega.estado %></span></td>
+                  <td>
+                    <ul>
+                      <% entrega.productos.forEach(producto => { %>
+                        <li><%= producto.nombre %> (x<%= producto.cantidad %>)</li>
+                      <% }) %>
+                    </ul>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+    </section>
+  </main>
+
+  <%- include('partials/footer') %>
 </body>
 </html>
+
